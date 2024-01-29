@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block body %}
+
+<h1>Kreiraj Novosti</h1>
+
+<form action="{{ url_for('kreiraj_novosti') }}" method="POST">
+    <label for="title">Naziv:</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="category">Kategorije:</label>
+    <select id="category" name="category" required>
+        <option value="1">Kategorija 1</option>
+        <option value="2">Kategorija 2</option>
+        <option value="3">Kategorija 3</option>
+        <!-- Add more options as needed -->
+    </select>
+
+    <label for="content">Sadrzaj:</label>
+    <textarea id="editor" name="content" required></textarea>
+
+    <button type="submit">Objavi</button>
+</form>
+
+<script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+<script>
+    CKEDITOR.replace('editor');
+</script>
+
+{% endblock %}

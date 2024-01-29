@@ -6,17 +6,18 @@ import re
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
- 
-app.secret_key = 'your secret key'
- 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'baze'
- 
+
+app.secret_key = "your secret key"
+
+app.config["MYSQL_HOST"] = "localhost"
+app.config["MYSQL_USER"] = "root"
+app.config["MYSQL_PASSWORD"] = ""
+app.config["MYSQL_DB"] = "baze"
+
 mysql = MySQL(app)
 
-@app.route('/')
+
+@app.route("/")
 def home():
     ulogovan = False
     if "loggedin" in session and session["loggedin"]:
@@ -58,16 +59,18 @@ def login():
 
     return render_template("login.html", msg=msg)
 
-@app.route('/logout')
+
+@app.route("/logout")
 def logout():
-    session.pop('loggedin', None)
-    session.pop('id', None)
-    session.pop('username', None)
-    return redirect(url_for('login'))
+    session.pop("loggedin", None)
+    session.pop("id", None)
+    session.pop("username", None)
+    return redirect(url_for("login"))
+
 
 @app.route("/cms/register", methods=["GET", "POST"])
 def register():
-    if "loggedin" in session and session["loggedin"] and session['uloga'] != 1:
+    if "loggedin" in session and session["loggedin"] and session["uloga"] != 1:
         return redirect(url_for("home"))
     reg = False
     msg = ""
@@ -108,80 +111,115 @@ def register():
         else:
             cursor.execute(
                 "INSERT INTO accounts VALUES (NULL, % s, % s, % s, % s, % s, % s)",
-                (
-                    username,
-                    ime,
-                    prezime,
-                    email,
-                    uloga,
-                    password_hashed
-                ),
+                (username, ime, prezime, email, uloga, password_hashed),
             )
             mysql.connection.commit()
-            msg = "Uspešno ste dodali korisnika" 
+            msg = "Uspešno ste dodali korisnika"
             reg = True
     elif request.method == "POST":
         msg = "Popunite sva polja!"
     return render_template("register.html", msg=msg, reg=reg)
-    
-@app.route('/cms/zaposleni')
+
+
+@app.route("/cms/zaposleni")
 def zaposleni():
-    if "loggedin" not in session or not session["loggedin"] or session['uloga'] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
         return redirect(url_for("home"))
-    
+
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT id, username, ime, prezime, email, uloga FROM accounts")
     zaposleni = cursor.fetchall()
 
-    uloge = {
-        1: "Glavni urednik",
-        2: "Urednik",
-        3: "Novinar"
-    }
+    uloge = {1: "Glavni urednik", 2: "Urednik", 3: "Novinar"}
 
     return render_template("zaposleni.html", zaposleni=zaposleni, uloge=uloge)
 
-@app.route('/cms/izmeni_zaposlenog/<int:zaposleni_id>', methods=['GET', 'POST'])
+
+@app.route("/cms/izmeni_zaposlenog/<int:zaposleni_id>", methods=["GET", "POST"])
 def izmeni_zaposlenog(zaposleni_id):
-    if "loggedin" not in session or not session["loggedin"] or session['uloga'] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT * FROM accounts WHERE id = %s", (zaposleni_id,))
     zaposlen = cursor.fetchone()
 
-    if request.method == 'POST':
-        nov_username = request.form['username']
-        nov_email = request.form['email']
-        novo_ime = request.form['ime']
-        novo_prezime = request.form['prezime']
-        nova_uloga = request.form['uloga']
+    if request.method == "POST":
+        nov_username = request.form["username"]
+        nov_email = request.form["email"]
+        novo_ime = request.form["ime"]
+        novo_prezime = request.form["prezime"]
+        nova_uloga = request.form["uloga"]
 
         cursor.execute(
             "UPDATE accounts SET username=%s, email=%s, ime=%s, prezime=%s, uloga=%s WHERE id=%s",
-            (nov_username, nov_email, novo_ime, novo_prezime, nova_uloga, zaposleni_id)
+            (nov_username, nov_email, novo_ime, novo_prezime, nova_uloga, zaposleni_id),
         )
         mysql.connection.commit()
-        return redirect(url_for('zaposleni'))
+        return redirect(url_for("zaposleni"))
 
     return render_template("izmeni_zaposlenog.html", zaposlen=zaposlen)
 
-@app.route('/cms/ukloni_zaposlenog/<int:zaposleni_id>')
+
+@app.route("/cms/ukloni_zaposlenog/<int:zaposleni_id>")
 def ukloni_zaposlenog(zaposleni_id):
-    if "loggedin" not in session or not session["loggedin"] or session['uloga'] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("DELETE FROM accounts WHERE id = %s  AND uloga != 1", (zaposleni_id,))
+    cursor.execute(
+        "DELETE FROM accounts WHERE id = %s  AND uloga != 1", (zaposleni_id,)
+    )
     mysql.connection.commit()
 
-    return redirect(url_for('zaposleni'))
+    return redirect(url_for("zaposleni"))
 
-@app.route('/cms')
+
+@app.route("/cms")
 def cms():
-    if "loggedin" not in session or not session["loggedin"] :
+    if "loggedin" not in session or not session["loggedin"]:
         return redirect(url_for("home"))
-    return render_template('cms.html')
+    return render_template("cms.html")
+
+
+@app.route("/cms/kreiraj_novosti", methods=["GET", "POST"])
+def kreiraj_novosti():
+    if "loggedin" not in session or not session["loggedin"]:
+        return redirect(url_for("home"))
+
+    if request.method == "POST":
+        title = request.form["naziv"]
+        category = request.form["kategorija"]
+        content = request.form["sadrzaj"]
+
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            "INSERT INTO novosti (naziv, kategorija, sadrzaj, id_autora, status) VALUES (%s, %s, %s, %s, %s)",
+            (title, category, content, session["id"], 0),
+        )
+        mysql.connection.commit()
+
+        return redirect(url_for("home"))
+
+    return render_template("kreiraj_novosti.html")
+
+
+@app.route("/prikaz_novosti")
+def prikaz_novosti():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+        """
+        SELECT novosti.id, novosti.naziv, novosti.kategorija, novosti.sadrzaj,
+               novosti.status, accounts.username AS author_username
+        FROM novosti
+        INNER JOIN accounts ON novosti.id_autora = accounts.id
+        ORDER BY novosti.id DESC
+    """
+    )
+    novosti = cursor.fetchall()
+
+    return render_template("prikaz_novosti.html", novosti=novosti)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
