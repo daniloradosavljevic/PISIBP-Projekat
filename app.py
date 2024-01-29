@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 from flask_bcrypt import Bcrypt
 import MySQLdb.cursors
 import re
+import bleach
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -13,6 +14,41 @@ app.config["MYSQL_HOST"] = "localhost"
 app.config["MYSQL_USER"] = "root"
 app.config["MYSQL_PASSWORD"] = ""
 app.config["MYSQL_DB"] = "baze"
+
+# bleach koristimo za XSS security
+
+_ALLOWED_ATTRIBUTES = {
+    "a": ["href", "title"],
+    "img": ["src", "class"],
+    "table": ["class"],
+}
+_ALLOWED_TAGS = [
+    "b",
+    "i",
+    "ul",
+    "li",
+    "p",
+    "br",
+    "hr",
+    "a",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "ol",
+    "img",
+    "strong",
+    "code",
+    "em",
+    "blockquote",
+    "table",
+    "thead",
+    "tr",
+    "td",
+    "tbody",
+    "th",
+    "s",
+]
 
 mysql = MySQL(app)
 
@@ -188,9 +224,9 @@ def kreiraj_novosti():
         return redirect(url_for("home"))
 
     if request.method == "POST":
-        title = request.form["naziv"]
-        category = request.form["kategorija"]
-        content = request.form["sadrzaj"]
+        title = request.form["title"]
+        category = request.form["category"]
+        content = request.form["content"]
 
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(
@@ -217,6 +253,13 @@ def prikaz_novosti():
     """
     )
     novosti = cursor.fetchall()
+
+    for vest in novosti:
+        vest["sadrzaj"] = bleach.clean(
+            vest["sadrzaj"],
+            tags=_ALLOWED_TAGS,
+            attributes=_ALLOWED_ATTRIBUTES,
+        )
 
     return render_template("prikaz_novosti.html", novosti=novosti)
 

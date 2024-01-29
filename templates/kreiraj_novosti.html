@@ -2,7 +2,7 @@
 
 <h1>Kreiraj Novosti</h1>
 
-<form action="{{ url_for('kreiraj_novosti') }}" method="POST">
+<form action="{{ url_for('kreiraj_novosti') }}" method="POST" enctype="multipart/form-data">
     <label for="title">Naziv:</label>
     <input type="text" id="title" name="title" required>
 
@@ -22,7 +22,9 @@
 
 <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
 <script>
-    CKEDITOR.replace('editor');
+    CKEDITOR.replace('editor', {
+        allowedContent: true,
+    });
 </script>
 
 {% endblock %}

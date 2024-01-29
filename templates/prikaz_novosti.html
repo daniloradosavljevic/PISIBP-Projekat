@@ -8,7 +8,6 @@
     <p><strong>Kategorija:</strong> {{ vest['kategorija'] }}</p>
     <p><strong>Author:</strong> {{ vest['author_username'] }}</p>
     <div>
-        <!-- Use | safe to render HTML content -->
         {{ vest['sadrzaj'] | safe }}
     </div>
     <p><strong>Status:</strong> {{ vest['status'] }}</p>
