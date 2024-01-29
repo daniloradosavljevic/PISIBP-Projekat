@@ -60,7 +60,7 @@ def home():
         ulogovan = True
         return render_template("index.html", ulogovan=ulogovan)
     else:
-        return render_template("index.html", ulogovan=ulogovan)
+        return redirect(url_for("prikaz_novosti"))
 
 
 @app.route("/cms/login", methods=["GET", "POST"])
