@@ -1,18 +1,23 @@
 {% extends 'base.html' %}
 {% block body %}
-<div align="center">
-    <div align="center" class="border">
-       <div class="header">
-          <h1 class="word">Login</h1>
-       </div></br></br></br>
-      <h2 class="word">
-          <form action="{{ url_for('login') }}" method="post">
+<div class="bg-image">
+  <div class="container-fluid fw-bold"> 
+          <form action="{{ url_for('login') }}" method="post" class="mx-auto">
+            <div class="header-text text-center">
+              <h1 class="h1_lr">Login</h1>
+            </div>
             <div class="msg">{{ msg }}</div>
-              <input id="username" name="username" type="text" placeholder="Enter Your Username" class="textbox"/></br></br>
-              <input id="password" name="password" type="password" placeholder="Enter Your Password" class="textbox"/></br></br></br>
-              <input type="submit" class="btn" value="Sign In"></br></br>
+              <div class="input-group mb-3">
+                <input id="username" name="username" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Enter Your Username" class="textbox"/>
+              </div>
+              <div class="input-group mb-3">
+                <input id="password" name="password" type="password" class="form-control form-control-lg bg-light fs-6" placeholder="Enter Your Password" class="textbox"/>
+              </div>
+              <div class="mb-3">
+                <small class="h1_lr">Nemate nalog?<a href="{{url_for('register')}}"> Prijavite se ovde</a> </small>
+              </div>
+              <input type="submit" class="btn btn-lg btn_1 w-100 fs-6" value="Sign In">
           </form>
-      </h2>
-    </div>
   </div>
+</div>
 {% endblock %}
