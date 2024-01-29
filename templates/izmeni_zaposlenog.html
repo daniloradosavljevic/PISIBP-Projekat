@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% block body %}
+
+<div align="center">
+    <div align="center" class="border">
+        <div class="header">
+            <h1 class="word">Izmena zaposlenog</h1>
+        </div>
+        <form action="" method="post">
+            <input type="text" name="username" value="{{ zaposlen.username }}" placeholder="Username" class="textbox" /><br><br>
+            <input type="text" name="email" value="{{ zaposlen.email }}" placeholder="Email" class="textbox" /><br><br>
+            <input type="text" name="ime" value="{{ zaposlen.ime }}" placeholder="Ime" class="textbox" /><br><br>
+            <input type="text" name="prezime" value="{{ zaposlen.prezime }}" placeholder="Prezime" class="textbox" /><br><br>
+            
+            <select name="uloga" class="textbox">
+                <option value="1" {% if zaposlen.uloga == 1 %} selected {% endif %}>Glavni urednik</option>
+                {% if zaposlen.uloga != 1 %}
+                <option value="2" {% if zaposlen.uloga == 2 %} selected {% endif %}>Urednik</option>
+                <option value="3" {% if zaposlen.uloga == 3 %} selected {% endif %}>Novinar</option>
+                {% endif %}
+            </select><br><br>
+            <input type="submit" value="Izmeni zaposlenog" class="btn" />
+            <a class="bottom" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}
