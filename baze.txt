@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jan 29, 2024 at 08:38 PM
+-- Generation Time: Jan 30, 2024 at 03:23 PM
 -- Server version: 8.2.0
 -- PHP Version: 8.2.13
 
@@ -45,6 +45,30 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 
 INSERT INTO `accounts` (`id`, `username`, `ime`, `prezime`, `email`, `uloga`, `password`) VALUES
 (1, 'demo', 'demo', 'demoivc', 'demovic@mail.com', 1, '$2b$12$v6txDULYXfW1WSE0PTY/6u9bQJz3HarGy.rMlsaGJnDZn02lXegUS');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `komentari`
+--
+
+DROP TABLE IF EXISTS `komentari`;
+CREATE TABLE IF NOT EXISTS `komentari` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `vest_id` int NOT NULL,
+  `ime` varchar(25) NOT NULL,
+  `komentar` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `komentari`
+--
+
+INSERT INTO `komentari` (`id`, `vest_id`, `ime`, `komentar`) VALUES
+(1, 1, 'Test', 'Dobra vest, nema sta!'),
+(2, 1, 'test2', 'test2'),
+(3, 1, 'test3', 'teest3');
 
 -- --------------------------------------------------------
 

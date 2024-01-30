@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block body %}
+
+{% if msg %}
+{{ msg }}
+{% endif %}
+<h2>Dodaj komentar:</h2>
+<form method="post" action="{{ url_for('komentarisi', vest_id=vest_id) }}">
+    <label for="ime">Ime:</label>
+    <input type="text" name="ime" required>
+    <br>
+    <label for="komentar">Komentar:</label>
+    <textarea name="komentar" rows="4" cols="50" required></textarea>
+    <br>
+    <button type="submit">Dodaj komentar</button>
+</form>
+
+<a href="{{ url_for('prikaz_novosti') }}" >Vrati se na vesti</a>
+{% endblock %}

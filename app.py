@@ -263,6 +263,24 @@ def prikaz_novosti():
 
     return render_template("prikaz_novosti.html", novosti=novosti)
 
+@app.route("/komentarisi/<int:vest_id>", methods=["GET", "POST"])
+def komentarisi(vest_id):
+    if request.method == "POST":
+        ime = request.form["ime"]
+        komentar = request.form["komentar"]
+
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            "INSERT INTO komentari (vest_id, ime, komentar) VALUES (%s, %s, %s)",
+            (vest_id, ime, komentar),
+        )
+        mysql.connection.commit()
+        msg = 'Uspešno ste komentarisali ovu vest!'
+        return render_template('komentarisi.html',vest_id=vest_id,msg=msg)
+
+    return render_template('komentarisi.html',vest_id=vest_id)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

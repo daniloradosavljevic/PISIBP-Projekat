@@ -12,5 +12,6 @@
     </div>
     <p><strong>Status:</strong> {{ vest['status'] }}</p>
     <hr>
+    <a href="{{ url_for('komentarisi', vest_id=vest['id']) }}">Komentariši</a>
 </div>
 {% endfor %} {% endblock %}
