@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <div class="content">
+    <h2>{{ vest.naziv }}</h2>
+    <p>Author: {{ vest.author_username }}</p>
+    <p>Category: {{ vest.kategorija }}</p>
+    <p>Status: {{ vest.status }}</p>
+    <div>{{ vest.sadrzaj | safe }}</div>
+    <a href="{{ url_for('prikaz_novosti') }}" >Vrati se na vesti</a>
+    <a href="{{ url_for('komentarisi', vest_id=vest.id) }}">Komentariši</a>
+  </div>
+
+  {% if vest.komentari %}
+    <div class="comments">
+      <h3>Komentari:</h3>
+      <ul>
+        {% for komentar in vest.komentari %}
+          <li>
+            <strong>{{ komentar.ime }}</strong>: {{ komentar.komentar }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endblock %}

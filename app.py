@@ -263,6 +263,54 @@ def prikaz_novosti():
 
     return render_template("prikaz_novosti.html", novosti=novosti)
 
+@app.route("/vest/<int:vest_id>")
+def vest(vest_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+        """
+        SELECT
+            novosti.id,
+            novosti.naziv,
+            novosti.kategorija,
+            novosti.sadrzaj,
+            novosti.status,
+            accounts.username AS author_username,
+            komentari.id AS komentar_id,
+            komentari.ime AS komentar_ime,
+            komentari.komentar AS komentar_tekst
+        FROM novosti
+        INNER JOIN accounts ON novosti.id_autora = accounts.id
+        LEFT JOIN komentari ON novosti.id = komentari.vest_id
+        WHERE novosti.id = %s
+        """, (vest_id,)
+    )
+    rezultat = cursor.fetchall()
+
+    if rezultat:
+        komentari = {}
+        for red in rezultat:
+            komentar_id = red.get("komentar_id")
+            if komentar_id not in komentari:
+                komentari[komentar_id] = {
+                    "id": komentar_id,
+                    "ime": red.get("komentar_ime"),
+                    "komentar": red.get("komentar_tekst"),
+                }
+
+        vest_data = {
+            "id": rezultat[0].get("id"),
+            "naziv": rezultat[0].get("naziv"),
+            "kategorija": rezultat[0].get("kategorija"),
+            "sadrzaj": rezultat[0].get("sadrzaj"),
+            "status": rezultat[0].get("status"),
+            "author_username": rezultat[0].get("author_username"),
+            "komentari": list(komentari.values()),
+        }
+
+        return render_template('vest.html', vest=vest_data)
+
+    return url_for('home')
+
 @app.route("/komentarisi/<int:vest_id>", methods=["GET", "POST"])
 def komentarisi(vest_id):
     if request.method == "POST":
