@@ -4,9 +4,15 @@ from flask_bcrypt import Bcrypt
 import MySQLdb.cursors
 import re
 import bleach
+import ip_address as ip
+
+#from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
+#app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
 
 app.secret_key = "your secret key"
 
@@ -327,6 +333,106 @@ def komentarisi(vest_id):
         return render_template('komentarisi.html',vest_id=vest_id,msg=msg)
 
     return render_template('komentarisi.html',vest_id=vest_id)
+
+@app.context_processor
+def inject_functions():
+    def broj_lajkova(vest_id, tip):
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            "SELECT COUNT(*) AS count FROM lajkovi_vesti WHERE id_vesti = %s AND tip = %s",
+            (vest_id, tip),
+        )
+        rezultat = cursor.fetchone()
+        return rezultat["count"]
+
+    def broj_lajkova_komentara(komentar_id, tip):
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            "SELECT COUNT(*) AS count FROM lajkovi_komentara WHERE id_komentara = %s AND tip = %s",
+            (komentar_id, tip),
+        )
+        rezultat = cursor.fetchone()
+        return rezultat["count"]
+
+    return dict(broj_lajkova=broj_lajkova, broj_lajkova_komentara=broj_lajkova_komentara)
+    
+
+
+@app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["POST"])
+def lajkovanje(vest_id, tip):
+    public_ip = ip.get() 
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    
+    cursor.execute(
+        "SELECT * FROM lajkovi_vesti WHERE id_vesti = %s AND ip_adresa = %s",
+        (vest_id, public_ip),
+    )
+    postoji_lajk_dislajk = cursor.fetchone()
+
+    if postoji_lajk_dislajk:
+        stari_tip = postoji_lajk_dislajk['tip']
+
+        # Brisemo ako korisnik hoce 2 puta da  lajkuje/dislajjkuje
+        if stari_tip == tip:
+            cursor.execute(
+                "DELETE FROM lajkovi_vesti WHERE id_vesti = %s AND ip_adresa = %s",
+                (vest_id, public_ip),
+            )
+        else:
+        
+            cursor.execute(
+                "UPDATE lajkovi_vesti SET tip = %s WHERE id_vesti = %s AND ip_adresa = %s",
+                (tip, vest_id, public_ip),
+            )
+    else:
+        cursor.execute(
+            "INSERT INTO lajkovi_vesti (id_vesti, ip_adresa, tip) VALUES (%s, %s, %s)",
+            (vest_id, public_ip, tip),
+        )
+
+    mysql.connection.commit()
+
+    return redirect(url_for("vest", vest_id=vest_id))
+
+
+@app.route("/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>", methods=["POST"])
+def lajkovanje_komentara(komentar_id, vest_id, tip):
+    public_ip = ip.get()
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cursor.execute(
+        "SELECT * FROM lajkovi_komentara WHERE id_komentara = %s AND ip_adresa = %s",
+        (komentar_id, public_ip),
+    )
+    postoji_lajk_dislajk = cursor.fetchone()
+
+    if postoji_lajk_dislajk:
+        stari_tip = postoji_lajk_dislajk['tip']
+
+        # Brišemo ako korisnik hoće 2 puta da lajkuje/dislajkuje
+        if stari_tip == tip:
+            cursor.execute(
+                "DELETE FROM lajkovi_komentara WHERE id_komentara = %s AND ip_adresa = %s",
+                (komentar_id, public_ip),
+            )
+        else:
+            cursor.execute(
+                "UPDATE lajkovi_komentara SET tip = %s WHERE id_komentara = %s AND ip_adresa = %s",
+                (tip, komentar_id, public_ip),
+            )
+    else:
+        cursor.execute(
+            "INSERT INTO lajkovi_komentara (id_komentara, ip_adresa, tip) VALUES (%s, %s, %s)",
+            (komentar_id, public_ip, tip),
+        )
+
+    mysql.connection.commit()
+
+    # Povratak na istu stranicu gde je vest (gde su komentari)
+    return redirect(url_for('vest', vest_id=vest_id))
+
+
+
 
 
 
