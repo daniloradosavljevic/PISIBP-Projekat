@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jan 30, 2024 at 03:23 PM
+-- Generation Time: Feb 04, 2024 at 09:20 PM
 -- Server version: 8.2.0
 -- PHP Version: 8.2.13
 
@@ -37,14 +37,36 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `uloga` int NOT NULL,
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `accounts`
 --
 
 INSERT INTO `accounts` (`id`, `username`, `ime`, `prezime`, `email`, `uloga`, `password`) VALUES
-(1, 'demo', 'demo', 'demoivc', 'demovic@mail.com', 1, '$2b$12$v6txDULYXfW1WSE0PTY/6u9bQJz3HarGy.rMlsaGJnDZn02lXegUS');
+(1, 'demo', 'demo', 'demoivc', 'demovic@mail.com', 1, '$2b$12$v6txDULYXfW1WSE0PTY/6u9bQJz3HarGy.rMlsaGJnDZn02lXegUS'),
+(2, 'test', 'test', 'testic', 'markoviclazar20@gmail.com', 1, '$2b$12$U93G2OW.IpD94.8./67NB.4dKey0O8or2B6Qhi8M3XGE6b1HaSNVq');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `images`
+--
+
+DROP TABLE IF EXISTS `images`;
+CREATE TABLE IF NOT EXISTS `images` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `filename` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_image_name` (`filename`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `images`
+--
+
+INSERT INTO `images` (`id`, `filename`) VALUES
+(1, 'test.jpeg');
 
 -- --------------------------------------------------------
 
@@ -59,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `komentari` (
   `ime` varchar(25) NOT NULL,
   `komentar` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `komentari`
@@ -68,7 +90,64 @@ CREATE TABLE IF NOT EXISTS `komentari` (
 INSERT INTO `komentari` (`id`, `vest_id`, `ime`, `komentar`) VALUES
 (1, 1, 'Test', 'Dobra vest, nema sta!'),
 (2, 1, 'test2', 'test2'),
-(3, 1, 'test3', 'teest3');
+(3, 1, 'test3', 'teest3'),
+(4, 1, 'top', 'top'),
+(5, 1, 'neko', 'nesto'),
+(6, 2, 'test2', 'dobar komentar'),
+(7, 2, 'coda', 'coda brat'),
+(8, 2, 'Wow', 'radi');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lajkovi_komentara`
+--
+
+DROP TABLE IF EXISTS `lajkovi_komentara`;
+CREATE TABLE IF NOT EXISTS `lajkovi_komentara` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_komentara` int NOT NULL,
+  `ip_adresa` varchar(15) NOT NULL,
+  `tip` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_lajk_komentara` (`id_komentara`,`ip_adresa`),
+  KEY `idx_lajk_komentara_tip` (`id_komentara`,`tip`)
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `lajkovi_komentara`
+--
+
+INSERT INTO `lajkovi_komentara` (`id`, `id_komentara`, `ip_adresa`, `tip`) VALUES
+(6, 1, '178.237.218.221', 0),
+(9, 6, '178.237.218.221', 1),
+(13, 6, '178.149.16.165', 1),
+(14, 7, '178.149.16.165', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lajkovi_vesti`
+--
+
+DROP TABLE IF EXISTS `lajkovi_vesti`;
+CREATE TABLE IF NOT EXISTS `lajkovi_vesti` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_vesti` int NOT NULL,
+  `ip_adresa` varchar(15) NOT NULL,
+  `tip` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `lajkovi_vesti`
+--
+
+INSERT INTO `lajkovi_vesti` (`id`, `id_vesti`, `ip_adresa`, `tip`) VALUES
+(11, 1, '178.237.218.220', 0),
+(19, 1, '178.237.218.221', 1),
+(24, 2, '178.237.218.221', 0),
+(25, 2, '178.149.16.165', 1);
 
 -- --------------------------------------------------------
 
@@ -86,14 +165,18 @@ CREATE TABLE IF NOT EXISTS `novosti` (
   `status` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `author_id` (`id_autora`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `novosti`
 --
 
 INSERT INTO `novosti` (`id`, `naziv`, `kategorija`, `sadrzaj`, `id_autora`, `status`) VALUES
-(1, 'Demo novosti', '1', '<h2>What is Lorem Ipsum?</h2>\n\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&#39;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<br />\n<br />\n<em><s>test<img alt=\"\" src=\"https://imgur.com/gallery/ByJo3Xz\" style=\"height:100px; width:100px\" /></s></em></p>\n\n<h2>Why do we use it?</h2>\n\n<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using &#39;Content here, content here&#39;, making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for &#39;lorem ipsum&#39; will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).<br />\n<br />\n&nbsp;</p>\n\n<h2>Where does it come from?m a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of &quot;de Finibus Bonorum et Malorum&quot; (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of et</h2>\n\n<p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, frohics, very popular during the Renaissance. The first line of Lorem Ipsum, &quot;Lorem ipsum dolor sit amet..&quot;, comes from a line in section 1.10.32.</p>\n\n<p>&nbsp;</p>\n\n<h2>Where can I get some?</h2>\n\n<p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don&#39;t look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn&#39;t anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.</p>\n', 1, 0);
+(1, 'Demo novosti', '1', '<h2>What is Lorem Ipsum?</h2>\n\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&#39;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<br />\n<br />\n<em><s>test<img alt=\"\" src=\"https://imgur.com/gallery/ByJo3Xz\" style=\"height:100px; width:100px\" /></s></em></p>\n\n<h2>Why do we use it?</h2>\n\n<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using &#39;Content here, content here&#39;, making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for &#39;lorem ipsum&#39; will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).<br />\n<br />\n&nbsp;</p>\n\n<h2>Where does it come from?m a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of &quot;de Finibus Bonorum et Malorum&quot; (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of et</h2>\n\n<p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, frohics, very popular during the Renaissance. The first line of Lorem Ipsum, &quot;Lorem ipsum dolor sit amet..&quot;, comes from a line in section 1.10.32.</p>\n\n<p>&nbsp;</p>\n\n<h2>Where can I get some?</h2>\n\n<p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don&#39;t look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn&#39;t anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.</p>\n', 1, 0),
+(2, 'Novost 2', '2', '<p>Sedamnaestog sunčanog jutra, u zabačenom selu podno planina, mladi istraživač kroči stazom prepunom misterija. Sa svakim korakom osećao je uzbuđenje i tajanstvenu prisutnost prirode koja je &scaron;aptom komunicirala sa svakim drvećem. <strong>U daljini, brujanje reke dopiralo je do njegovih u&scaron;iju kao melodija koja je pozivala na istraživanje nepoznatog. Sunce je igralo svoju igru sa li&scaron;ćem, stvarajući sjenke koje su pričale priču o pro&scaron;losti i budućnosti istovremeno.</strong><br />\r\n&nbsp;</p>\r\n', 1, 0),
+(3, 'test', '1', '<p><img src=\"../static/uploads/test.jpeg\" alt=\"\" width=\"348\" height=\"261\"></p>\r\n<h2>What is Lorem Ipsum?</h2>\r\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>', 2, 0),
+(4, 'test', '1', '<p><img src=\"../static/uploads/test.jpeg\" alt=\"\" width=\"340\" height=\"255\"></p>\r\n<h2>What is Lorem Ipsum?</h2>\r\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>', 2, 0),
+(5, 'test 2', '1', '<h2>What is Lorem Ipsum?</h2>\r\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<img src=\"../static/uploads/test.jpeg\" alt=\"\" width=\"340\" height=\"255\"></p>', 2, 0);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -1,17 +1,27 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+import os
+from flask import (
+    Flask,
+    abort,
+    jsonify,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+)
 from flask_mysqldb import MySQL
 from flask_bcrypt import Bcrypt
 import MySQLdb.cursors
 import re
-import bleach
 import ip_address as ip
+from werkzeug.utils import secure_filename
 
-#from werkzeug.middleware.proxy_fix import ProxyFix
+# from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-#app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+# app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 
 app.secret_key = "your secret key"
@@ -21,40 +31,6 @@ app.config["MYSQL_USER"] = "root"
 app.config["MYSQL_PASSWORD"] = ""
 app.config["MYSQL_DB"] = "baze"
 
-# bleach koristimo za XSS security
-
-_ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title"],
-    "img": ["src", "class"],
-    "table": ["class"],
-}
-_ALLOWED_TAGS = [
-    "b",
-    "i",
-    "ul",
-    "li",
-    "p",
-    "br",
-    "hr",
-    "a",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "ol",
-    "img",
-    "strong",
-    "code",
-    "em",
-    "blockquote",
-    "table",
-    "thead",
-    "tr",
-    "td",
-    "tbody",
-    "th",
-    "s",
-]
 
 mysql = MySQL(app)
 
@@ -234,7 +210,7 @@ def kreiraj_novosti():
         category = request.form["category"]
         content = request.form["content"]
 
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor = mysql.connection.cursor()
         cursor.execute(
             "INSERT INTO novosti (naziv, kategorija, sadrzaj, id_autora, status) VALUES (%s, %s, %s, %s, %s)",
             (title, category, content, session["id"], 0),
@@ -244,6 +220,33 @@ def kreiraj_novosti():
         return redirect(url_for("home"))
 
     return render_template("kreiraj_novosti.html")
+
+
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+
+@app.route("/upload_image", methods=["POST"])
+def upload_image():
+    if "file" not in request.files:
+        return {"error": "No file part"}, 400
+
+    file = request.files["file"]
+
+    if file.filename == "":
+        return {"error": "No selected file"}, 400
+
+    if file:
+        filename = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+        file.save(filename)
+
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("INSERT INTO images (filename) VALUES (%s)", (file.filename,))
+        mysql.connection.commit()
+
+        return {"location": url_for("static", filename=f"uploads/{file.filename}")}
+
+    return {"error": "Unexpected error"}, 500
 
 
 @app.route("/prikaz_novosti")
@@ -260,14 +263,8 @@ def prikaz_novosti():
     )
     novosti = cursor.fetchall()
 
-    for vest in novosti:
-        vest["sadrzaj"] = bleach.clean(
-            vest["sadrzaj"],
-            tags=_ALLOWED_TAGS,
-            attributes=_ALLOWED_ATTRIBUTES,
-        )
-
     return render_template("prikaz_novosti.html", novosti=novosti)
+
 
 @app.route("/vest/<int:vest_id>")
 def vest(vest_id):
@@ -288,7 +285,8 @@ def vest(vest_id):
         INNER JOIN accounts ON novosti.id_autora = accounts.id
         LEFT JOIN komentari ON novosti.id = komentari.vest_id
         WHERE novosti.id = %s
-        """, (vest_id,)
+        """,
+        (vest_id,),
     )
     rezultat = cursor.fetchall()
 
@@ -313,9 +311,10 @@ def vest(vest_id):
             "komentari": list(komentari.values()),
         }
 
-        return render_template('vest.html', vest=vest_data)
+        return render_template("vest.html", vest=vest_data)
 
-    return url_for('home')
+    return url_for("home")
+
 
 @app.route("/komentarisi/<int:vest_id>", methods=["GET", "POST"])
 def komentarisi(vest_id):
@@ -329,10 +328,11 @@ def komentarisi(vest_id):
             (vest_id, ime, komentar),
         )
         mysql.connection.commit()
-        msg = 'Uspešno ste komentarisali ovu vest!'
-        return render_template('komentarisi.html',vest_id=vest_id,msg=msg)
+        msg = "Uspešno ste komentarisali ovu vest!"
+        return render_template("komentarisi.html", vest_id=vest_id, msg=msg)
 
-    return render_template('komentarisi.html',vest_id=vest_id)
+    return render_template("komentarisi.html", vest_id=vest_id)
+
 
 @app.context_processor
 def inject_functions():
@@ -354,15 +354,16 @@ def inject_functions():
         rezultat = cursor.fetchone()
         return rezultat["count"]
 
-    return dict(broj_lajkova=broj_lajkova, broj_lajkova_komentara=broj_lajkova_komentara)
-    
+    return dict(
+        broj_lajkova=broj_lajkova, broj_lajkova_komentara=broj_lajkova_komentara
+    )
 
 
 @app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["POST"])
 def lajkovanje(vest_id, tip):
-    public_ip = ip.get() 
+    public_ip = ip.get()
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    
+
     cursor.execute(
         "SELECT * FROM lajkovi_vesti WHERE id_vesti = %s AND ip_adresa = %s",
         (vest_id, public_ip),
@@ -370,7 +371,7 @@ def lajkovanje(vest_id, tip):
     postoji_lajk_dislajk = cursor.fetchone()
 
     if postoji_lajk_dislajk:
-        stari_tip = postoji_lajk_dislajk['tip']
+        stari_tip = postoji_lajk_dislajk["tip"]
 
         # Brisemo ako korisnik hoce 2 puta da  lajkuje/dislajjkuje
         if stari_tip == tip:
@@ -379,7 +380,7 @@ def lajkovanje(vest_id, tip):
                 (vest_id, public_ip),
             )
         else:
-        
+
             cursor.execute(
                 "UPDATE lajkovi_vesti SET tip = %s WHERE id_vesti = %s AND ip_adresa = %s",
                 (tip, vest_id, public_ip),
@@ -395,7 +396,9 @@ def lajkovanje(vest_id, tip):
     return redirect(url_for("vest", vest_id=vest_id))
 
 
-@app.route("/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>", methods=["POST"])
+@app.route(
+    "/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>", methods=["POST"]
+)
 def lajkovanje_komentara(komentar_id, vest_id, tip):
     public_ip = ip.get()
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -407,7 +410,7 @@ def lajkovanje_komentara(komentar_id, vest_id, tip):
     postoji_lajk_dislajk = cursor.fetchone()
 
     if postoji_lajk_dislajk:
-        stari_tip = postoji_lajk_dislajk['tip']
+        stari_tip = postoji_lajk_dislajk["tip"]
 
         # Brišemo ako korisnik hoće 2 puta da lajkuje/dislajkuje
         if stari_tip == tip:
@@ -428,12 +431,7 @@ def lajkovanje_komentara(komentar_id, vest_id, tip):
 
     mysql.connection.commit()
 
-    # Povratak na istu stranicu gde je vest (gde su komentari)
-    return redirect(url_for('vest', vest_id=vest_id))
-
-
-
-
+    return redirect(url_for("vest", vest_id=vest_id))
 
 
 if __name__ == "__main__":
