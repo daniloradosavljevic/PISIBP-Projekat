@@ -248,9 +248,18 @@ def upload_image():
 
     return {"error": "Unexpected error"}, 500
 
+def procesuiraj_sadrzaj_vesti(novosti):
+    for vest in novosti:
+        start_index = vest['sadrzaj'].find('<img')
+        end_index = vest['sadrzaj'].find('>', start_index) + 1 if start_index != -1 else -1
+        vest['sadrzaj'] = vest['sadrzaj'][start_index:end_index]
+
 
 @app.route("/prikaz_novosti")
 def prikaz_novosti():
+    stranica = int(request.args.get('stranica', 1))
+    rezultati_po_stranici = 4
+    offset = (stranica - 1) * rezultati_po_stranici
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
         """
@@ -259,12 +268,12 @@ def prikaz_novosti():
         FROM novosti
         INNER JOIN accounts ON novosti.id_autora = accounts.id
         ORDER BY novosti.id DESC
-    """
-    )
+        LIMIT %s OFFSET %s
+    """, (rezultati_po_stranici, offset))
     novosti = cursor.fetchall()
+    procesuiraj_sadrzaj_vesti(novosti)
 
-    return render_template("prikaz_novosti.html", novosti=novosti)
-
+    return render_template("prikaz_novosti.html", novosti=novosti, stranica=stranica,rezultati_po_stranici=rezultati_po_stranici)
 
 @app.route("/vest/<int:vest_id>")
 def vest(vest_id):
@@ -357,6 +366,8 @@ def inject_functions():
     return dict(
         broj_lajkova=broj_lajkova, broj_lajkova_komentara=broj_lajkova_komentara
     )
+
+    
 
 
 @app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["POST"])

@@ -14,4 +14,16 @@
     <hr>
     <a href="{{ url_for('vest', vest_id=vest['id']) }}">Pročitaj više</a>
 </div>
-{% endfor %} {% endblock %}
+{% endfor %} 
+
+<div>
+    {% if stranica > 1 %}
+        <a href="{{ url_for('prikaz_novosti', stranica=stranica-1) }}">Prethodna stranica</a>
+    {% endif %}
+    
+    {% if novosti|length >= rezultati_po_stranici %}
+        <a href="{{ url_for('prikaz_novosti', stranica=stranica+1) }}">Sledeća stranica</a>
+    {% endif %}
+</div>
+
+{% endblock %}
