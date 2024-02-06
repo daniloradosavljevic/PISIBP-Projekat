@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% block body %}
+<h1>Novosti</h1>
+
+<h2>Hello, {{ session.username }}!!</h2>
+<p>Here are your news:</p>
+
+{% for vest in novosti %}
+<div>
+    <h2>{{ vest['naziv'] }}</h2>
+    <p><strong>Kategorija:</strong> {{ vest['kategorija'] }}</p>
+    <p><strong>Datum:</strong> {{ vest['datum'] }}</p>
+    <p><strong>Status:</strong> {% if vest['status'] == 0 %} Neodobreno
+        <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id'])}}">Zatraži odobrenje</a> {% else %} Odobreno {% endif %}
+    </p>
+    <a href="{{ url_for('vest', vest_id=vest['id']) }}">Pročitaj više</a>
+    <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'])}}">Zatraži izmenu</a>
+    <hr>
+</div>
+{% endfor %}
+
+<div>
+    {% if stranica > 1 %}
+    <a href="{{ url_for('pregled_novosti', stranica=stranica-1) }}">Prethodna stranica</a> {% endif %} {% if novosti|length >= rezultati_po_stranici %}
+    <a href="{{ url_for('pregled_novosti', stranica=stranica+1) }}">Sledeća stranica</a> {% endif %}
+</div>
+{% endblock %}

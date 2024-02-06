@@ -15,6 +15,7 @@ import MySQLdb.cursors
 import re
 import ip_address as ip
 from werkzeug.utils import secure_filename
+import datetime
 
 # from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -209,22 +210,26 @@ def kreiraj_novosti():
     cursor.execute("SELECT id, naziv FROM kategorije")
     categories = cursor.fetchall()
 
-
     if request.method == "POST":
         title = request.form["title"]
         category = request.form["category"]
         content = request.form["content"]
+        tags = request.form["tags"]
+
+        tags = re.sub(r"<[^>]+>", "", tags)
+
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         cursor = mysql.connection.cursor()
         cursor.execute(
-            "INSERT INTO novosti (naziv, kategorija, sadrzaj, id_autora, status) VALUES (%s, %s, %s, %s, %s)",
-            (title, category, content, session["id"], 0),
+            "INSERT INTO novosti (naziv, kategorija, sadrzaj, id_autora, status, datum, tagovi) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (title, category, content, session["id"], 0, date, tags),
         )
         mysql.connection.commit()
 
         return redirect(url_for("home"))
-    print(categories)
-    return render_template("kreiraj_novosti.html",categories=categories)
+
+    return render_template("kreiraj_novosti.html", categories=categories)
 
 
 UPLOAD_FOLDER = "static/uploads"
@@ -253,45 +258,57 @@ def upload_image():
 
     return {"error": "Unexpected error"}, 500
 
+
 def procesuiraj_sadrzaj_vesti(novosti):
     for vest in novosti:
-        start_index = vest['sadrzaj'].find('<img')
-        end_index = vest['sadrzaj'].find('>', start_index) + 1 if start_index != -1 else -1
-        vest['sadrzaj'] = vest['sadrzaj'][start_index:end_index]
+        start_index = vest["sadrzaj"].find("<img")
+        end_index = (
+            vest["sadrzaj"].find(">", start_index) + 1 if start_index != -1 else -1
+        )
+        vest["sadrzaj"] = vest["sadrzaj"][start_index:end_index]
 
 
 @app.route("/prikaz_novosti")
 def prikaz_novosti():
-    stranica = int(request.args.get('stranica', 1))
+    stranica = int(request.args.get("stranica", 1))
     rezultati_po_stranici = 4
     offset = (stranica - 1) * rezultati_po_stranici
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-    """
+        """
     SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija, 
-           novosti.sadrzaj, novosti.status, accounts.username AS author_username
+           novosti.sadrzaj, novosti.datum, accounts.username AS author_username
     FROM novosti
     INNER JOIN accounts ON novosti.id_autora = accounts.id
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
     ORDER BY novosti.id DESC
     LIMIT %s OFFSET %s
-    """, (rezultati_po_stranici, offset))
+    """,
+        (rezultati_po_stranici, offset),
+    )
     novosti = cursor.fetchall()
     procesuiraj_sadrzaj_vesti(novosti)
 
-    return render_template("prikaz_novosti.html", novosti=novosti, stranica=stranica,rezultati_po_stranici=rezultati_po_stranici)
+    return render_template(
+        "prikaz_novosti.html",
+        novosti=novosti,
+        stranica=stranica,
+        rezultati_po_stranici=rezultati_po_stranici,
+    )
+
 
 @app.route("/vest/<int:vest_id>")
 def vest(vest_id):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-    """
+        """
     SELECT
         novosti.id,
         novosti.naziv,
         kategorije.naziv AS kategorija,
         novosti.sadrzaj,
-        novosti.status,
+        novosti.datum,
+        novosti.tagovi, -- Fetching tags from 'novosti' table
         accounts.username AS author_username,
         komentari.id AS komentar_id,
         komentari.ime AS komentar_ime,
@@ -302,7 +319,8 @@ def vest(vest_id):
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
     WHERE novosti.id = %s
     """,
-    (vest_id,),)
+        (vest_id,),
+    )
     rezultat = cursor.fetchall()
 
     if rezultat:
@@ -321,7 +339,8 @@ def vest(vest_id):
             "naziv": rezultat[0].get("naziv"),
             "kategorija": rezultat[0].get("kategorija"),
             "sadrzaj": rezultat[0].get("sadrzaj"),
-            "status": rezultat[0].get("status"),
+            "datum": rezultat[0].get("datum"),
+            "tagovi": rezultat[0].get("tagovi"),  # Added tags to vest_data
             "author_username": rezultat[0].get("author_username"),
             "komentari": list(komentari.values()),
         }
@@ -372,8 +391,6 @@ def inject_functions():
     return dict(
         broj_lajkova=broj_lajkova, broj_lajkova_komentara=broj_lajkova_komentara
     )
-
-    
 
 
 @app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["POST"])
@@ -453,7 +470,7 @@ def lajkovanje_komentara(komentar_id, vest_id, tip):
 
 @app.route("/cms/prikaz_kategorija", methods=["GET", "POST"])
 def prikaz_kategorija():
-    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -462,26 +479,29 @@ def prikaz_kategorija():
 
     return render_template("prikaz_kategorija.html", kategorije=kategorije)
 
+
 @app.route("/cms/izmeni_kategoriju/<int:kategorija_id>", methods=["GET", "POST"])
 def izmeni_kategoriju(kategorija_id):
-    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
-        
+
     if request.method == "POST":
         nova_vrednost = request.form["nova_vrednost"]
-        cursor.execute("UPDATE kategorije SET naziv = %s WHERE id = %s", (nova_vrednost, kategorija_id))
+        cursor.execute(
+            "UPDATE kategorije SET naziv = %s WHERE id = %s",
+            (nova_vrednost, kategorija_id),
+        )
         mysql.connection.commit()
         return redirect(url_for("prikaz_kategorija"))
-    
-    return redirect(url_for('prikaz_kategorija'))
 
+    return redirect(url_for("prikaz_kategorija"))
 
 
 @app.route("/cms/obrisi_kategoriju/<int:kategorija_id>", methods=["POST"])
 def obrisi_kategoriju(kategorija_id):
-    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -490,9 +510,10 @@ def obrisi_kategoriju(kategorija_id):
 
     return redirect(url_for("prikaz_kategorija"))
 
+
 @app.route("/cms/dodaj_kategoriju", methods=["GET", "POST"])
 def dodaj_kategoriju():
-    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -501,14 +522,114 @@ def dodaj_kategoriju():
         nova_vrednost = request.form.get("nova_vrednost")
 
         if nova_vrednost:
-            cursor.execute("INSERT INTO kategorije (naziv) VALUES (%s)", (nova_vrednost,))
+            cursor.execute(
+                "INSERT INTO kategorije (naziv) VALUES (%s)", (nova_vrednost,)
+            )
             mysql.connection.commit()
             cursor.close()
             return redirect(url_for("prikaz_kategorija"))
         else:
-            return redirect(url_for('prikaz_kategorija'))
+            return redirect(url_for("prikaz_kategorija"))
 
     return render_template("dodaj_kategoriju.html")
+
+
+@app.route("/cms/pregled_novosti")
+def pregled_novosti():
+    if "loggedin" not in session or not session["loggedin"]:
+        return redirect(url_for("home"))
+
+    stranica = int(request.args.get("stranica", 1))
+    rezultati_po_stranici = 4
+    offset = (stranica - 1) * rezultati_po_stranici
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+        """
+        SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija,
+               novosti.sadrzaj, novosti.status, novosti.datum
+        FROM novosti
+        INNER JOIN kategorije ON novosti.kategorija = kategorije.id
+        WHERE novosti.id_autora = %s
+        ORDER BY novosti.datum DESC
+        LIMIT %s OFFSET %s
+        """,
+        (session["id"], rezultati_po_stranici, offset),
+    )
+    novosti = cursor.fetchall()
+
+    return render_template(
+        "pregled_novosti.html",
+        novosti=novosti,
+        stranica=stranica,
+        rezultati_po_stranici=rezultati_po_stranici,
+    )
+
+
+@app.route("/cms/zatrazi_odobrenje/<int:vest_id>")
+def zatrazi_odobrenje(vest_id):
+    if "loggedin" not in session or not session["loggedin"]:
+        return redirect(url_for("home"))
+
+    id_autora = session["id"]
+    date = (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),)
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT naziv FROM novosti WHERE id = %s", (vest_id,))
+    vest = cursor.fetchone()
+
+    if vest:
+        naziv_vesti = vest[0]  # Accessing the first element of the tuple
+        zahtev = f"Korisnik {session['username']} je zatražio odobrenje za sledeću vest: {naziv_vesti}"
+
+        cursor.execute(
+            """
+            INSERT INTO zahtevi (id_autora, id_novosti, datum, zahtev)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (
+                id_autora,
+                vest_id,
+                date,
+                zahtev,
+            ),
+        )
+        mysql.connection.commit()
+
+    return redirect(url_for("pregled_novosti"))
+
+
+@app.route("/cms/zatrazi_izmenu/<int:vest_id>")
+def zatrazi_izmenu(vest_id):
+    if "loggedin" not in session or not session["loggedin"]:
+        return redirect(url_for("home"))
+
+    id_autora = session["id"]
+    date = (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),)
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT naziv FROM novosti WHERE id = %s", (vest_id,))
+    vest = cursor.fetchone()
+
+    if vest:
+        naziv_vesti = vest[0]  # Accessing the first element of the tuple
+        zahtev = f"Korisnik {session['username']} je zatražio izmenu za sledeću vest: {naziv_vesti}"
+
+        cursor.execute(
+            """
+            INSERT INTO zahtevi (id_autora, id_novosti, datum, zahtev)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (
+                id_autora,
+                vest_id,
+                date,
+                zahtev,
+            ),
+        )
+        mysql.connection.commit()
+
+    return redirect(url_for("pregled_novosti"))
 
 
 if __name__ == "__main__":

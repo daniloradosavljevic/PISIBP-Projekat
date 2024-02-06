@@ -17,6 +17,10 @@
     <label for="content">Sadrzaj:</label>
     <textarea id="editor" name="content">{{ content|e }}</textarea>
 
+    <label for="tags">Tagovi:</label>
+    <p>Unesite tagove razdvojene zarezom (npr. fudbal, manchester city, barcelona)</p>
+    <textarea id="tags" name="tags" style="width: 300px;"></textarea>
+
     <button type="submit">Objavi</button>
 </form>
 
@@ -24,8 +28,8 @@
 
 <script>
     tinymce.init({
-        selector: 'textarea',
-        plugins: 'tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+        selector: 'textarea#editor',
+        plugins: 'autoresize tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
         toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
         tinycomments_mode: 'embedded',
         tinycomments_author: 'Author name',
@@ -35,10 +39,17 @@
         }, {
             value: 'Email',
             title: 'Email'
-        }, ],
+        }],
         images_upload_url: '/upload_image',
         images_upload_base_path: '',
         images_upload_credentials: true,
+    });
+
+    tinymce.init({
+        selector: 'textarea#tags',
+        plugins: 'autoresize',
+        toolbar: false,
+        menubar: false
     });
 </script>
 {% endblock %}
