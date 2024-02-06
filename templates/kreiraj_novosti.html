@@ -9,10 +9,9 @@
 
     <label for="category">Kategorije:</label>
     <select id="category" name="category" required>
-        <option value="1">Kategorija 1</option>
-        <option value="2">Kategorija 2</option>
-        <option value="3">Kategorija 3</option>
-        <!-- Add more options as needed -->
+        {% for category in categories %}
+        <option value="{{ category[0] }}">{{ category[1] }}</option>
+        {% endfor %}
     </select>
 
     <label for="content">Sadrzaj:</label>

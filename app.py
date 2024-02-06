@@ -205,6 +205,11 @@ def kreiraj_novosti():
     if "loggedin" not in session or not session["loggedin"]:
         return redirect(url_for("home"))
 
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT id, naziv FROM kategorije")
+    categories = cursor.fetchall()
+
+
     if request.method == "POST":
         title = request.form["title"]
         category = request.form["category"]
@@ -218,8 +223,8 @@ def kreiraj_novosti():
         mysql.connection.commit()
 
         return redirect(url_for("home"))
-
-    return render_template("kreiraj_novosti.html")
+    print(categories)
+    return render_template("kreiraj_novosti.html",categories=categories)
 
 
 UPLOAD_FOLDER = "static/uploads"
@@ -262,13 +267,14 @@ def prikaz_novosti():
     offset = (stranica - 1) * rezultati_po_stranici
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-        """
-        SELECT novosti.id, novosti.naziv, novosti.kategorija, novosti.sadrzaj,
-               novosti.status, accounts.username AS author_username
-        FROM novosti
-        INNER JOIN accounts ON novosti.id_autora = accounts.id
-        ORDER BY novosti.id DESC
-        LIMIT %s OFFSET %s
+    """
+    SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija, 
+           novosti.sadrzaj, novosti.status, accounts.username AS author_username
+    FROM novosti
+    INNER JOIN accounts ON novosti.id_autora = accounts.id
+    INNER JOIN kategorije ON novosti.kategorija = kategorije.id
+    ORDER BY novosti.id DESC
+    LIMIT %s OFFSET %s
     """, (rezultati_po_stranici, offset))
     novosti = cursor.fetchall()
     procesuiraj_sadrzaj_vesti(novosti)
@@ -279,24 +285,24 @@ def prikaz_novosti():
 def vest(vest_id):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-        """
-        SELECT
-            novosti.id,
-            novosti.naziv,
-            novosti.kategorija,
-            novosti.sadrzaj,
-            novosti.status,
-            accounts.username AS author_username,
-            komentari.id AS komentar_id,
-            komentari.ime AS komentar_ime,
-            komentari.komentar AS komentar_tekst
-        FROM novosti
-        INNER JOIN accounts ON novosti.id_autora = accounts.id
-        LEFT JOIN komentari ON novosti.id = komentari.vest_id
-        WHERE novosti.id = %s
-        """,
-        (vest_id,),
-    )
+    """
+    SELECT
+        novosti.id,
+        novosti.naziv,
+        kategorije.naziv AS kategorija,
+        novosti.sadrzaj,
+        novosti.status,
+        accounts.username AS author_username,
+        komentari.id AS komentar_id,
+        komentari.ime AS komentar_ime,
+        komentari.komentar AS komentar_tekst
+    FROM novosti
+    INNER JOIN accounts ON novosti.id_autora = accounts.id
+    LEFT JOIN komentari ON novosti.id = komentari.vest_id
+    INNER JOIN kategorije ON novosti.kategorija = kategorije.id
+    WHERE novosti.id = %s
+    """,
+    (vest_id,),)
     rezultat = cursor.fetchall()
 
     if rezultat:
@@ -443,6 +449,66 @@ def lajkovanje_komentara(komentar_id, vest_id, tip):
     mysql.connection.commit()
 
     return redirect(url_for("vest", vest_id=vest_id))
+
+
+@app.route("/cms/prikaz_kategorija", methods=["GET", "POST"])
+def prikaz_kategorija():
+    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM kategorije")
+    kategorije = cursor.fetchall()
+
+    return render_template("prikaz_kategorija.html", kategorije=kategorije)
+
+@app.route("/cms/izmeni_kategoriju/<int:kategorija_id>", methods=["GET", "POST"])
+def izmeni_kategoriju(kategorija_id):
+    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+        
+    if request.method == "POST":
+        nova_vrednost = request.form["nova_vrednost"]
+        cursor.execute("UPDATE kategorije SET naziv = %s WHERE id = %s", (nova_vrednost, kategorija_id))
+        mysql.connection.commit()
+        return redirect(url_for("prikaz_kategorija"))
+    
+    return redirect(url_for('prikaz_kategorija'))
+
+
+
+@app.route("/cms/obrisi_kategoriju/<int:kategorija_id>", methods=["POST"])
+def obrisi_kategoriju(kategorija_id):
+    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("DELETE FROM kategorije WHERE id = %s", (kategorija_id,))
+    mysql.connection.commit()
+
+    return redirect(url_for("prikaz_kategorija"))
+
+@app.route("/cms/dodaj_kategoriju", methods=["GET", "POST"])
+def dodaj_kategoriju():
+    if "loggedin" not in session or not session["loggedin"] and session['tip'] != 1:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+
+    if request.method == "POST":
+        nova_vrednost = request.form.get("nova_vrednost")
+
+        if nova_vrednost:
+            cursor.execute("INSERT INTO kategorije (naziv) VALUES (%s)", (nova_vrednost,))
+            mysql.connection.commit()
+            cursor.close()
+            return redirect(url_for("prikaz_kategorija"))
+        else:
+            return redirect(url_for('prikaz_kategorija'))
+
+    return render_template("dodaj_kategoriju.html")
 
 
 if __name__ == "__main__":

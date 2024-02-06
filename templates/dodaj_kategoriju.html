@@ -1,0 +1,14 @@
+{% extends 'base.html' %} 
+{% block body %}
+
+<h1>Dodaj Kategoriju</h1>
+
+<form method="post">
+    <label for="nova_vrednost">Naziv kategorije:</label>
+    <input type="text" id="nova_vrednost" name="nova_vrednost" required>
+    <button type="submit">Dodaj</button>
+</form>
+
+<a href="{{ url_for('prikaz_kategorija') }}">Nazad na prikaz kategorija</a>
+
+{% endblock %}
