@@ -258,6 +258,42 @@ def upload_image():
 
     return {"error": "Unexpected error"}, 500
 
+@app.route("/cms/izmeni_novost/<int:novost_id>", methods=["GET", "POST"])
+def izmeni_novost(novost_id):
+    if "loggedin" not in session or not session["loggedin"]:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT id, naziv FROM kategorije")
+    categories = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM novosti WHERE id = %s", (novost_id,))
+    novost = cursor.fetchone()
+    if not novost:
+        return redirect(url_for("home"))
+
+    if session['id'] != novost[4]:
+        return redirect(url_for("home"))
+    
+    if request.method == "POST":
+        title = request.form["title"]
+        category = request.form["category"]
+        content = request.form["content"]
+        tags = request.form["tags"]
+
+        tags = re.sub(r"<[^>]+>", "", tags)
+
+        cursor = mysql.connection.cursor()
+        cursor.execute(
+            "UPDATE novosti SET naziv=%s, kategorija=%s, sadrzaj=%s, tagovi=%s WHERE id=%s",
+            (title, category, content, tags, novost_id),
+        )
+        mysql.connection.commit()
+
+        return redirect(url_for("pregled_novosti"))
+    return render_template("izmeni_novost.html", categories=categories, novost=novost)
+
+
 
 def procesuiraj_sadrzaj_vesti(novosti):
     for vest in novosti:
@@ -510,6 +546,27 @@ def obrisi_kategoriju(kategorija_id):
 
     return redirect(url_for("prikaz_kategorija"))
 
+@app.route("/cms/obrisi_novost/<int:novost_id>", methods=["POST"])
+def obrisi_novost(novost_id):
+    if "loggedin" not in session or not session["loggedin"]:
+        return redirect(url_for("home"))
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT id_autora FROM novosti WHERE id = %s", (novost_id,))
+    result = cursor.fetchone()
+
+    if not result:
+        return redirect(url_for("home"))
+
+    id_autora = result[0]
+
+    if session['id'] != id_autora:
+        return redirect(url_for("home"))
+
+    cursor.execute("DELETE FROM novosti WHERE id = %s", (novost_id,))
+    mysql.connection.commit()
+
+    return redirect(url_for("pregled novosti"))
+
 
 @app.route("/cms/dodaj_kategoriju", methods=["GET", "POST"])
 def dodaj_kategoriju():
@@ -630,6 +687,8 @@ def zatrazi_izmenu(vest_id):
         mysql.connection.commit()
 
     return redirect(url_for("pregled_novosti"))
+
+
 
 
 if __name__ == "__main__":

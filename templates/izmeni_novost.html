@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<h1>Izmeni Novost</h1>
+
+<form action="{{ url_for('izmeni_novost', novost_id=novost[0]) }}" method="POST" enctype="multipart/form-data">
+
+    <label for="title">Naziv:</label>
+    <input type="text" id="title" name="title" required value="{{ novost[1]|e }}">
+
+    <label for="category">Kategorije:</label>
+    <select id="category" name="category" required>
+        {% for category in categories %}
+        <option value="{{ category[0] }}" {% if category[0] == novost[2] %}selected{% endif %}>{{ category[1] }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="content">Sadrzaj:</label>
+    <textarea id="editor" name="content">{{ novost[3]|e }}</textarea>
+
+    <label for="tags">Tagovi:</label>
+    <p>Unesite tagove razdvojene zarezom (npr. fudbal, manchester city, barcelona)</p>
+    <textarea id="tags" name="tags" style="width: 300px;">{{ novost[7]|e }}</textarea>
+
+    <button type="submit">Izmeni</button>
+</form>
+
+<script src="https://cdn.tiny.cloud/1/zkg28kxvnu9159r9s043yf77k4a5loyteodvjytupjrmqai6/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+    tinymce.init({
+        selector: 'textarea#editor',
+        plugins: 'autoresize tinycomments mentions anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed permanentpen footnotes advtemplate advtable advcode editimage tableofcontents mergetags powerpaste tinymcespellchecker autocorrect a11ychecker typography inlinecss',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | align lineheight | tinycomments | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        mergetags_list: [{
+            value: 'First.Name',
+            title: 'First Name'
+        }, {
+            value: 'Email',
+            title: 'Email'
+        }],
+        images_upload_url: '/upload_image',
+        images_upload_base_path: '',
+        images_upload_credentials: true,
+    });
+
+    tinymce.init({
+        selector: 'textarea#tags',
+        plugins: 'autoresize',
+        toolbar: false,
+        menubar: false
+    });
+</script>
+{% endblock %}

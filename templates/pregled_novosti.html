@@ -13,6 +13,9 @@
         <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id'])}}">Zatraži odobrenje</a> {% else %} Odobreno {% endif %}
     </p>
     <a href="{{ url_for('vest', vest_id=vest['id']) }}">Pročitaj više</a>
+    <a href="{{ url_for('izmeni_novost', novost_id=vest['id']) }}">Izmeni vest</a>
+    <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')" >Obrisi vest</a>
+
     <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'])}}">Zatraži izmenu</a>
     <hr>
 </div>
