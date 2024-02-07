@@ -2,6 +2,7 @@ import os
 from flask import (
     Flask,
     abort,
+    flash,
     jsonify,
     render_template,
     request,
@@ -258,6 +259,7 @@ def upload_image():
 
     return {"error": "Unexpected error"}, 500
 
+
 @app.route("/cms/izmeni_novost/<int:novost_id>", methods=["GET", "POST"])
 def izmeni_novost(novost_id):
     if "loggedin" not in session or not session["loggedin"]:
@@ -272,9 +274,9 @@ def izmeni_novost(novost_id):
     if not novost:
         return redirect(url_for("home"))
 
-    if session['id'] != novost[4]:
+    if session["id"] != novost[4]:
         return redirect(url_for("home"))
-    
+
     if request.method == "POST":
         title = request.form["title"]
         category = request.form["category"]
@@ -294,7 +296,6 @@ def izmeni_novost(novost_id):
     return render_template("izmeni_novost.html", categories=categories, novost=novost)
 
 
-
 def procesuiraj_sadrzaj_vesti(novosti):
     for vest in novosti:
         start_index = vest["sadrzaj"].find("<img")
@@ -309,27 +310,48 @@ def prikaz_novosti():
     stranica = int(request.args.get("stranica", 1))
     rezultati_po_stranici = 4
     offset = (stranica - 1) * rezultati_po_stranici
+
+    search_query = request.args.get("search_query", "")
+    category = request.args.get("category", "")
+
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute(
-        """
+    query = """
     SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija, 
            novosti.sadrzaj, novosti.datum, accounts.username AS author_username
     FROM novosti
     INNER JOIN accounts ON novosti.id_autora = accounts.id
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
-    ORDER BY novosti.id DESC
-    LIMIT %s OFFSET %s
-    """,
-        (rezultati_po_stranici, offset),
-    )
+    WHERE 1=1
+    """
+
+    params = []
+
+    if search_query:
+        query += " AND (novosti.naziv LIKE %s OR novosti.sadrzaj LIKE %s)"
+        params.extend([f"%{search_query}%", f"%{search_query}%"])
+
+    if category:
+        query += " AND novosti.kategorija = %s"
+        params.append(category)
+
+    query += " ORDER BY novosti.id DESC LIMIT %s OFFSET %s"
+    params.extend([rezultati_po_stranici, offset])
+
+    cursor.execute(query, params)
     novosti = cursor.fetchall()
     procesuiraj_sadrzaj_vesti(novosti)
+
+    cursor.execute("SELECT * FROM kategorije")
+    categories = cursor.fetchall()
 
     return render_template(
         "prikaz_novosti.html",
         novosti=novosti,
         stranica=stranica,
         rezultati_po_stranici=rezultati_po_stranici,
+        categories=categories,
+        search_query=search_query,
+        category=category,
     )
 
 
@@ -546,10 +568,12 @@ def obrisi_kategoriju(kategorija_id):
 
     return redirect(url_for("prikaz_kategorija"))
 
-@app.route("/cms/obrisi_novost/<int:novost_id>", methods=["POST"])
+
+@app.route("/cms/obrisi_novost/<int:novost_id>", methods=["GET", "POST"])
 def obrisi_novost(novost_id):
     if "loggedin" not in session or not session["loggedin"]:
         return redirect(url_for("home"))
+
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT id_autora FROM novosti WHERE id = %s", (novost_id,))
     result = cursor.fetchone()
@@ -559,13 +583,13 @@ def obrisi_novost(novost_id):
 
     id_autora = result[0]
 
-    if session['id'] != id_autora:
+    if session["id"] != id_autora:
         return redirect(url_for("home"))
 
     cursor.execute("DELETE FROM novosti WHERE id = %s", (novost_id,))
     mysql.connection.commit()
 
-    return redirect(url_for("pregled novosti"))
+    return redirect(url_for("pregled_novosti"))
 
 
 @app.route("/cms/dodaj_kategoriju", methods=["GET", "POST"])
@@ -629,29 +653,34 @@ def zatrazi_odobrenje(vest_id):
         return redirect(url_for("home"))
 
     id_autora = session["id"]
-    date = (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),)
 
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT naziv FROM novosti WHERE id = %s", (vest_id,))
     vest = cursor.fetchone()
 
-    if vest:
-        naziv_vesti = vest[0]  # Accessing the first element of the tuple
-        zahtev = f"Korisnik {session['username']} je zatražio odobrenje za sledeću vest: {naziv_vesti}"
+    if not vest:
+        return redirect(url_for("pregled_novosti"))
 
-        cursor.execute(
-            """
-            INSERT INTO zahtevi (id_autora, id_novosti, datum, zahtev)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (
-                id_autora,
-                vest_id,
-                date,
-                zahtev,
-            ),
-        )
-        mysql.connection.commit()
+    cursor.execute(
+        "SELECT * FROM zahtevi WHERE id_autora = %s AND id_novosti = %s AND zahtev = 'Odobrenje'",
+        (id_autora, vest_id),
+    )
+    existing_request = cursor.fetchone()
+
+    if existing_request:
+        return redirect(url_for("pregled_novosti"))
+
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    zahtev = "Odobrenje"
+
+    cursor.execute(
+        """
+        INSERT INTO zahtevi (id_autora, id_novosti, datum, zahtev)
+        VALUES (%s, %s, %s, %s)
+        """,
+        (id_autora, vest_id, date, zahtev),
+    )
+    mysql.connection.commit()
 
     return redirect(url_for("pregled_novosti"))
 
@@ -662,33 +691,36 @@ def zatrazi_izmenu(vest_id):
         return redirect(url_for("home"))
 
     id_autora = session["id"]
-    date = (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),)
 
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT naziv FROM novosti WHERE id = %s", (vest_id,))
     vest = cursor.fetchone()
 
-    if vest:
-        naziv_vesti = vest[0]  # Accessing the first element of the tuple
-        zahtev = f"Korisnik {session['username']} je zatražio izmenu za sledeću vest: {naziv_vesti}"
+    if not vest:
+        return redirect(url_for("pregled_novosti"))
 
-        cursor.execute(
-            """
-            INSERT INTO zahtevi (id_autora, id_novosti, datum, zahtev)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (
-                id_autora,
-                vest_id,
-                date,
-                zahtev,
-            ),
-        )
-        mysql.connection.commit()
+    cursor.execute(
+        "SELECT * FROM zahtevi WHERE id_autora = %s AND id_novosti = %s AND zahtev = 'Izmena'",
+        (id_autora, vest_id),
+    )
+    existing_request = cursor.fetchone()
+
+    if existing_request:
+        return redirect(url_for("pregled_novosti"))
+
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    zahtev = "Izmena"
+
+    cursor.execute(
+        """
+        INSERT INTO zahtevi (id_autora, id_novosti, datum, zahtev)
+        VALUES (%s, %s, %s, %s)
+        """,
+        (id_autora, vest_id, date, zahtev),
+    )
+    mysql.connection.commit()
 
     return redirect(url_for("pregled_novosti"))
-
-
 
 
 if __name__ == "__main__":

@@ -2,6 +2,15 @@
 <h1>Novosti</h1>
 
 <h2>Hello, {{ session.username }}!!</h2>
+
+<!-- JavaScript for displaying alert popup -->
+<script>
+    // Function to display alert popup
+    function showAlert(message) {
+        alert(message);
+    }
+</script>
+
 <p>Here are your news:</p>
 
 {% for vest in novosti %}
@@ -10,13 +19,12 @@
     <p><strong>Kategorija:</strong> {{ vest['kategorija'] }}</p>
     <p><strong>Datum:</strong> {{ vest['datum'] }}</p>
     <p><strong>Status:</strong> {% if vest['status'] == 0 %} Neodobreno
-        <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id'])}}">Zatraži odobrenje</a> {% else %} Odobreno {% endif %}
+        <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id']) }}" onclick="showAlert('Zahtev za odobrenje je poslat.')">Zatraži odobrenje</a> {% else %} Odobreno
+        <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id']) }}" onclick="showAlert('Zahtev za izmenu je poslat.')">Zatraži izmenu</a> {% endif %}
     </p>
-    <a href="{{ url_for('vest', vest_id=vest['id']) }}">Pročitaj više</a>
-    <a href="{{ url_for('izmeni_novost', novost_id=vest['id']) }}">Izmeni vest</a>
-    <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')" >Obrisi vest</a>
-
-    <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'])}}">Zatraži izmenu</a>
+    <a href="{{ url_for('vest', vest_id=vest['id']) }}">Pročitaj više</a> {% if vest['status'] == 0 %}
+    <a href="{{ url_for('izmeni_novost', novost_id=vest['id']) }}">Izmeni vest</a> {% endif %}
+    <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')">Obrisi vest</a>
     <hr>
 </div>
 {% endfor %}
