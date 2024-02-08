@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>Zahtevi</h1>
+    
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>ID Autora</th>
+            <th>ID Novosti</th>
+            <th>Zatrazeno</th>
+            <th>Zahtev</th>
+            <th>Akcije</th>
+        </tr>
+        {% for zahtev in zahtevi %}
+            <tr>
+                <td>{{ zahtev[0] }}</td>
+                <td>{{ zahtev[1] }}</td>
+                <td><a href="{{ url_for('vest', vest_id=zahtev[2]) }}">{{ zahtev[2] }}</a></td>
+                <td>{{ zahtev[3] }}</td>
+                <td>{{ zahtev[4] }}</td>
+                <td>
+                <form action="{{ url_for('odobri_zahtev', id_zahteva=zahtev[0], tip_zahteva=zahtev[4]) }}" method="post" style="display: inline;">
+                    <button type="submit">Odobri zahtev</button>
+                </form>
+                <form action="{{ url_for('odbij_zahtev', id_zahteva=zahtev[0]) }}" method="post" style="display: inline;">
+                    <button type="submit">Odbij zahtev</button>
+                </form>
+            </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

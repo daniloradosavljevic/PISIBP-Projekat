@@ -528,7 +528,7 @@ def lajkovanje_komentara(komentar_id, vest_id, tip):
 
 @app.route("/cms/prikaz_kategorija", methods=["GET", "POST"])
 def prikaz_kategorija():
-    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -540,7 +540,7 @@ def prikaz_kategorija():
 
 @app.route("/cms/izmeni_kategoriju/<int:kategorija_id>", methods=["GET", "POST"])
 def izmeni_kategoriju(kategorija_id):
-    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -559,7 +559,7 @@ def izmeni_kategoriju(kategorija_id):
 
 @app.route("/cms/obrisi_kategoriju/<int:kategorija_id>", methods=["POST"])
 def obrisi_kategoriju(kategorija_id):
-    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -594,7 +594,7 @@ def obrisi_novost(novost_id):
 
 @app.route("/cms/dodaj_kategoriju", methods=["GET", "POST"])
 def dodaj_kategoriju():
-    if "loggedin" not in session or not session["loggedin"] and session["tip"] != 1:
+    if "loggedin" not in session or not session["loggedin"] and session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -685,7 +685,7 @@ def zatrazi_odobrenje(vest_id):
     return redirect(url_for("pregled_novosti"))
 
 
-@app.route("/cms/zatrazi_izmenu/<int:vest_id>")
+@app.route("/cms/zatrazi_izmenu/<int:vest_id>", methods=["GET"])
 def zatrazi_izmenu(vest_id):
     if "loggedin" not in session or not session["loggedin"]:
         return redirect(url_for("home"))
@@ -699,9 +699,14 @@ def zatrazi_izmenu(vest_id):
     if not vest:
         return redirect(url_for("pregled_novosti"))
 
+    zahtev_tip = request.args.get("zahtev") 
+
+    if zahtev_tip not in ['Izmena', 'Brisanje']:
+        return redirect(url_for("pregled_novosti"))
+
     cursor.execute(
-        "SELECT * FROM zahtevi WHERE id_autora = %s AND id_novosti = %s AND zahtev = 'Izmena'",
-        (id_autora, vest_id),
+        "SELECT * FROM zahtevi WHERE id_autora = %s AND id_novosti = %s AND zahtev = %s",
+        (id_autora, vest_id, zahtev_tip),
     )
     existing_request = cursor.fetchone()
 
@@ -709,18 +714,62 @@ def zatrazi_izmenu(vest_id):
         return redirect(url_for("pregled_novosti"))
 
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    zahtev = "Izmena"
 
     cursor.execute(
         """
         INSERT INTO zahtevi (id_autora, id_novosti, datum, zahtev)
         VALUES (%s, %s, %s, %s)
         """,
-        (id_autora, vest_id, date, zahtev),
+        (id_autora, vest_id, date, zahtev_tip),
     )
     mysql.connection.commit()
 
     return redirect(url_for("pregled_novosti"))
+
+@app.route("/cms/prikaz_zahteva",methods=["GET", "POST"])
+def prikaz_zahteva():
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM zahtevi")
+    zahtevi = cursor.fetchall()
+
+    return render_template("prikaz_zahteva.html", zahtevi=zahtevi)
+
+@app.route("/cms/odobri_zahtev/<int:id_zahteva>/<string:tip_zahteva>",methods=["GET","POST"])
+def odobri_zahtev(id_zahteva, tip_zahteva):
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+
+    if tip_zahteva == 'Odobrenje':
+        cursor.execute("UPDATE novosti n JOIN zahtevi z ON n.id = z.id_novosti SET n.status = 1 WHERE z.id = %s", (id_zahteva,))
+    elif tip_zahteva == 'Izmena':
+        cursor.execute("UPDATE novosti n JOIN zahtevi z ON n.id = z.id_novosti SET n.status = 0 WHERE z.id = %s", (id_zahteva,))
+    else:
+        return redirect(url_for("prikaz_zahteva"))
+
+    mysql.connection.commit()
+
+    return redirect(url_for('odbij_zahtev', id_zahteva=id_zahteva))
+
+
+@app.route('/odbij_zahtev/<int:id_zahteva>', methods=["GET","POST"])
+def odbij_zahtev(id_zahteva):
+    cursor = mysql.connection.cursor()
+
+    try:
+        cursor.execute("DELETE FROM zahtevi WHERE id = %s", (id_zahteva,))
+        mysql.connection.commit()
+        cursor.close()
+        return redirect(url_for('prikaz_zahteva'))
+    except Exception as e:
+        print(f"Error: {e}")
+        cursor.close()
+        return redirect(url_for('prikaz_zahteva'))
+
 
 
 if __name__ == "__main__":
