@@ -1,28 +1,70 @@
 {% extends 'base.html' %} {% block body %}
-
-<div align="center">
-    <div align="center" class="border">
-        <div class="header">
-            <h1 class="word">Izmena zaposlenog</h1>
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                <a href="{{ url_for('cms') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <i class="fa-solid fa-person-digging text-white"></i><span class="fs-5 d-none d-sm-inline px-3">Meni</span>
+                </a>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                    <li>
+                        <a href="{{ url_for('zaposleni') }}" class="nav-link px-0 align-middle">
+                            <i class="fa-solid fa-people-roof text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lista zaposlenih</span> </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('kreiraj_novosti') }}" class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-file-circle-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Kreiraj novosti</span></a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('prikaz_novosti') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz novosti</span></a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('prikaz_kategorija') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-list text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz kategorija</span></a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('prikaz_zahteva') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-bell text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz zahteva</span></a>
+                    </li>
+                </ul>
+                <hr>
+                <div class="dropdown pb-4">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1">Korisnik</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                        <li><a class="dropdown-item" href="#">Nazad na sajt</a></li>
+                        <li><a class="dropdown-item" href="#">Odjavi se</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <form action="" method="post">
-            <input type="text" name="username" value="{{ zaposlen.username }}" placeholder="Username" class="textbox" /><br><br>
-            <input type="text" name="email" value="{{ zaposlen.email }}" placeholder="Email" class="textbox" /><br><br>
-            <input type="text" name="ime" value="{{ zaposlen.ime }}" placeholder="Ime" class="textbox" /><br><br>
-            <input type="text" name="prezime" value="{{ zaposlen.prezime }}" placeholder="Prezime" class="textbox" /><br><br>
+        <div class="col py-3">
+            <div align="center">
+                    <div class="header">
+                        <h1 class="word py-5">Izmena zaposlenog</h1>
+                    </div>
+                    <form action="" method="post">
+                        <input type="text" name="username" value="{{ zaposlen.username }}" placeholder="Username" class="textbox form-control" /><br><br>
+                        <input type="text" name="email" value="{{ zaposlen.email }}" placeholder="Email" class="textbox form-control" /><br><br>
+                        <input type="text" name="ime" value="{{ zaposlen.ime }}" placeholder="Ime" class="textbox form-control" /><br><br>
+                        <input type="text" name="prezime" value="{{ zaposlen.prezime }}" placeholder="Prezime" class="textbox form-control" /><br><br>
+                        
+                        <select name="uloga" class="textbox">
+                            <option value="1" {% if zaposlen.uloga == 1 %} selected {% endif %}>Glavni urednik</option>
+                            {% if zaposlen.uloga != 1 %}
+                            <option value="2" {% if zaposlen.uloga == 2 %} selected {% endif %}>Urednik</option>
+                            <option value="3" {% if zaposlen.uloga == 3 %} selected {% endif %}>Novinar</option>
+                            {% endif %}
+                        </select><br><br>
+                        <input type="submit" value="Izmeni zaposlenog" class="btn btn-dark btn-lg" /><br>
+                        <a class="bottom btn btn-dark text-center m-3" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
             
-            <select name="uloga" class="textbox">
-                <option value="1" {% if zaposlen.uloga == 1 %} selected {% endif %}>Glavni urednik</option>
-                {% if zaposlen.uloga != 1 %}
-                <option value="2" {% if zaposlen.uloga == 2 %} selected {% endif %}>Urednik</option>
-                <option value="3" {% if zaposlen.uloga == 3 %} selected {% endif %}>Novinar</option>
-                {% endif %}
-            </select><br><br>
-            <input type="submit" value="Izmeni zaposlenog" class="btn" />
-            <a class="bottom" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
-
-        </form>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}
