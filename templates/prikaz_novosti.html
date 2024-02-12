@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block body %}
+
+<h1>Novosti</h1>
+
+<form action="{{ url_for('prikaz_novosti') }}" method="GET">
+    <input type="text" name="search_query" placeholder="Pretraga" value="{{ search_query }}">
+    <select name="category">
+        <option value="" >Izaberi kategoriju</option>
+        {% for category in categories %}
+            <option value="{{ category['id'] }}" {% if category['id'] == category %} selected {% endif %}>{{ category['naziv'] }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Search</button> {% if search_query or category %}
+    <a href="{{ url_for('prikaz_novosti') }}" class="btn btn-secondary">Reset Search</a> {% endif %}
+</form>
+
+{% for vest in novosti %}
+<div>
+    <h2>{{ vest['naziv'] }}</h2>
+    <p><strong>Kategorija:</strong> {{ vest['kategorija'] }}</p>
+    <p><strong>Author:</strong> {{ vest['author_username'] }}</p>
+    <div>
+        {{ vest['sadrzaj'] | safe }}
+    </div>
+    <p><strong>Datum:</strong> {{ vest['datum'] }}</p>
+    <hr>
+    <a href="{{ url_for('vest', vest_id=vest['id']) }}">Pročitaj više</a>
+</div>
+{% endfor %}
+
+<div>
+    {% if stranica > 1 %}
+    <a href="{{ url_for('prikaz_novosti', stranica=stranica-1) }}">Prethodna stranica</a> {% endif %} {% if novosti|length >= rezultati_po_stranici %}
+    <a href="{{ url_for('prikaz_novosti', stranica=stranica+1) }}">Sledeća stranica</a> {% endif %}
+</div>
+
+{% endblock %}

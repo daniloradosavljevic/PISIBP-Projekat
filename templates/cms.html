@@ -1,9 +1,18 @@
-{% extends 'base.html' %}
-{% block body %}
+{% extends 'base.html' %} {% block body %}
 
 <h1>Dobrodošao na naš Content Managment System (CMS)!</h1>
 
 {% if session['uloga'] == 1 %}
-    <a href="{{ url_for('zaposleni') }}" >Lista zaposlenih</a>
-{% endif %}
-{% endblock %}
+</br>
+<a href="{{ url_for('zaposleni') }}">Lista zaposlenih</a>
+<br>
+<a href="{{ url_for('kreiraj_novosti') }}">Kreiraj novosti</a>
+</br>
+<a href="{{ url_for('prikaz_novosti') }}">Prikaz novosti</a>
+<br> 
+<a href="{{ url_for('prikaz_kategorija') }}">Prikaz kategorija</a>
+<br>
+<a href="{{ url_for('prikaz_zahteva') }}">Prikaz zahteva</a>
+<br>
+
+{% endif %} {% endblock %}
