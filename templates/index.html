@@ -6,6 +6,7 @@
 </br>
 <div class="container">
   <div class="row">
+    <h1 class="text-center">Top Vesti</h1>
     <div class="col-lg-8">
       <div class="d-flex justify-content-center">
         <div class="bg-image rounded" style="background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp'); height: 557px; width: 600px;">
@@ -20,33 +21,19 @@
     <div class="col-lg-4 d-none d-lg-block justify-content-center">
       <div class="card bg-dark text-white">
         <div class="card-body">
-          <h2>Najpopularnije vesti</h2>
+          <h2>Top 4 najnovije vesti sa najviše lajkova:</h2>
+          {% for vest in top_likes %}
                       <div class="d-flex border-bottom-blue pt-3 pb-4 align-items-center justify-content-between">
                         <div class=" pr-3 flex-grow-1">
-                          <h5>Advising Iran’s Supreme</h5>
+                          <h5>{{ vest['naziv'] }}</h5>
+                          
                           <div class="fs-12">
                               <p align="right"><a href="#link" class="btn text-light" role="button">Vidi jos</a></p>
                             <hr>
                           </div>
                         </div>
                       </div>
-                      <div class="d-flex border-bottom-blue pb-4 pt-4 align-items-center justify-content-between">
-                        <div class="pr-3 flex-grow-1">
-                          <h5>Virus Kills Member Of Advising Iran’s Supreme</h5>
-                          <div class="fs-12 align-">
-                              <p align="right"><a href="#link" class="btn text-light" role="button">Vidi jos</a></p>
-                            <hr>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="d-flex pt-4 align-items-center justify-content-between">
-                        <div class="pr-3 flex-grow-1">
-                          <h5>Virus Kills Member Of Advising Iran’s Supreme</h5>
-                          <div class="fs-12">
-                              <p align="right"><a href="#link" class="btn text-light" role="button">Vidi jos</a></p>
-                          </div>
-                        </div>
-                      </div>
+                      {% endfor %}
                     </div>
                   </div>
                 </div>
@@ -65,99 +52,39 @@
       <!-- kolona1 -->
       <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
         <div>
-          <!-- Glavna vest -->
+          {% if sport_news %}
           <div class="">
-            <img src="https://mdbcdn.b-cdn.net/img/new/fluid/city/113.webp" class="img-fluid" />
+            <img src="https://img.freepik.com/free-photo/sports-tools_53876-138077.jpg" class="img-fluid" />
             <a href="#!">
               <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
             </a>
           </div>
           <div class="row mb-3">
             <div class="col-6">
-              <a href="" class="text-info"  style="text-decoration: none;">
-                <i class="fas fa-plane"></i>Putovanja</a>
+              <a href="" class="text-success"  style="text-decoration: none;">
+                <i class="fa-solid fa-futbol"></i> Sport</a>
             </div>
             <div class="col-6 text-end">
               <u  class="text-white" style="text-decoration: none;" > 15.07.2020</u>
             </div>
           </div>
           <a href="" class="text-white" style="text-decoration: none;">
-            <h4>Najnovije vesti</h4>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit, iste aliquid. Sed
-              id nihil magni, sint vero provident esse numquam perferendis ducimus dicta
-              adipisci iusto nam temporibus modi animi laboriosam?
-            </p>
+            <h4>{{ sport_news['naziv'] }}</h4>
+            {% else %}
+            <p class="text-white text-center">Nema vesti u kategoriji Sport.</p>
+          {% endif %}
           </a>
           <hr />
-          <!-- sekundarna vest -->
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/041.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Hollywood Sign on The Hill" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/042.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Palm Springs Road" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/043.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Los Angeles Skyscrapers" />
-              </div>
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/044.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Skyscrapers" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
+          <!-- druga kolona -->
         </div>
       </div>
+      
       <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
         <div>
+          {% if politika_news %}
           <div class="">
-            <img src="https://mdbcdn.b-cdn.net/img/new/fluid/city/011.webp" class="img-fluid"
-              alt="Brooklyn Bridge" />
+            <img src="https://static.wixstatic.com/media/54959d_040702a7af37410eb49733cafbc0b2f7~mv2.jpg/v1/fill/w_1000,h_688,al_c,q_85,usm_0.66_1.00_0.01/54959d_040702a7af37410eb49733cafbc0b2f7~mv2.jpg" class="img-fluid"
+              alt="" />
             <a href="#!">
               <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
             </a>
@@ -165,7 +92,7 @@
           <div class="row mb-3">
             <div class="col-6">
               <a href="" class="text-danger"  style="text-decoration: none;">
-                <i class="fas fa-chart-pie"></i>Biznis</a>
+                <i class="fa-solid fa-book"></i> Politika</a>
             </div>
 
             <div class="col-6 text-end">
@@ -173,83 +100,22 @@
             </div>
           </div>
           <a href="" class="text-white"  style="text-decoration: none;">
-            <h5>Najnovije vesti</h5>
+            <h5>{{ politika_news['naziv'] }}</h5>
 
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit, iste aliquid. Sed
-              id nihil magni, sint vero provident esse numquam perferendis ducimus dicta
-              adipisci iusto nam temporibus modi animi laboriosam?
-            </p>
+            {% else %}
+            <p class="text-center text-white">Nema vesti u kategoriji Politika.</p>
+            {% endif %}
           </a>
-          <hr />
-          <a href="" class="text-white" style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/031.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Five Lands National Park" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/032.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Paris - Eiffel Tower" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white" style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/033.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Louvre" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white" style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/034.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Times Square" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
+          <hr/>
         </div>
       </div>
       <!-- kolona3 -->
       <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
         <div>
+          {% if tehnologija_news %}
           <div class="">
-            <img src="https://mdbcdn.b-cdn.net/img/new/fluid/city/018.webp" class="img-fluid"
-              alt="Golden Gate National Recreation Area" />
+            <img src="https://www.it-akademija.com/cms/mestoZaUploadFajlove/razvoj-tehnologija.jpg" class="img-fluid"
+              alt="" />
             <a href="#!">
               <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
             </a>
@@ -267,73 +133,13 @@
             </div>
           </div>
           <a href="" class="text-white"  style="text-decoration: none;">
-            <h5>Najnovije vesti</h5>
+            <h5>{{ tehnologija_news['naziv'] }}</h5>
 
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit, iste aliquid. Sed
-              id nihil magni, sint vero provident esse numquam perferendis ducimus dicta
-              adipisci iusto nam temporibus modi animi laboriosam?
-            </p>
+            {% else %}
+            <p class="text-center text-white">Nema vesti u kategoriji Tehnologija.</p>
+          {% endif %}
           </a>
           <hr />
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/011.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Brooklyn Bridge" />
-              </div>
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/012.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Hamilton Park" />
-              </div>
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/013.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Perdana Botanical Garden Kuala Lumpur" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
-          <a href="" class="text-white"  style="text-decoration: none;">
-            <div class="row mb-4 border-bottom pb-2">
-              <div class="col-3">
-                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/014.webp"
-                  class="img-fluid shadow-1-strong rounded" alt="Perdana Botanical Garden" />
-              </div>
-
-              <div class="col-9">
-                <p class="mb-2"><strong>Neke vesti</strong></p>
-                <p>
-                  <u  style="text-decoration: none;"> 15.07.2020</u>
-                </p>
-              </div>
-            </div>
-          </a>
         </div>
       </div>
     </div>

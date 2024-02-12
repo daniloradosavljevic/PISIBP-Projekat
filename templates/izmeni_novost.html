@@ -1,28 +1,28 @@
 {% extends 'base.html' %}
 {% block body %}
-
-<h1>Izmeni Novost</h1>
+<div class="cotainer">
+    <h1 class="text-center py-3">Izmeni Novost</h1>
 
 <form action="{{ url_for('izmeni_novost', novost_id=novost[0]) }}" method="POST" enctype="multipart/form-data">
 
-    <label for="title">Naziv:</label>
-    <input type="text" id="title" name="title" required value="{{ novost[1]|e }}">
+    <label for="title" class="m-3">Naziv:</label>
+    <input type="text" id="title" name="title" required value="{{ novost[1]|e }}" class=""><br>
 
-    <label for="category">Kategorije:</label>
+    <label for="category" class="m-3">Kategorije:</label>
     <select id="category" name="category" required>
         {% for category in categories %}
-        <option value="{{ category[0] }}" {% if category[0] == novost[2] %}selected{% endif %}>{{ category[1] }}</option>
+        <option value="{{ category[0] }}" {% if category[0] == novost[2] %}selected{% endif %}>{{ category[1] }}</option><br>
         {% endfor %}
     </select>
 
-    <label for="content">Sadrzaj:</label>
+    <br><label for="content" class="m-3">Sadrzaj:</label>
     <textarea id="editor" name="content">{{ novost[3]|e }}</textarea>
 
-    <label for="tags">Tagovi:</label>
-    <p>Unesite tagove razdvojene zarezom (npr. fudbal, manchester city, barcelona)</p>
-    <textarea id="tags" name="tags" style="width: 300px;">{{ novost[7]|e }}</textarea>
+    <label for="tags" class="m-3">Tagovi:</label>
+    <p class="m-3"s>Unesite tagove razdvojene zarezom (npr. fudbal, manchester city, barcelona)</p>
+    <textarea id="tags" name="tags" style="width: 300px;" >{{ novost[7]|e }}</textarea><br>
 
-    <button type="submit">Izmeni</button>
+    <button type="submit" class="btn btn-dark text-center m-3">Izmeni</button>
 </form>
 
 <script src="https://cdn.tiny.cloud/1/zkg28kxvnu9159r9s043yf77k4a5loyteodvjytupjrmqai6/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
@@ -53,4 +53,6 @@
         menubar: false
     });
 </script>
+</div>
+
 {% endblock %}

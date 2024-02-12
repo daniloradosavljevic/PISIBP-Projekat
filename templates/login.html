@@ -1,8 +1,8 @@
 {% extends 'base.html' %} {% block body %}
 <div align="center">
-    <div align="center" class="border">
+
         <div class="header">
-            <h1 class="word">Login</h1>
+            <h1 class="word py-3">Login</h1>
         </div>
         </br>
         </br>
@@ -15,14 +15,13 @@
                 <input id="password" name="password" type="password" placeholder="Enter Your Password" class="textbox" /></br>
                 </br>
                 </br>
-                <input type="submit" class="btn" value="Sign In"></br>
+                <input type="submit" class="btn btn-lg btn-dark" value="Sign In"></br>
                 </br>
                 </br>
-                <a href="{{ url_for('prikaz_novosti') }}">Prikaz novosti</a>
+                <a href="{{ url_for('prikaz_novosti') }}"class="btn btn-dark text-center btn-lg">Prikaz novosti</a>
                 <br>
             </form>
         </h2>
-    </div>
 </div>
 
 {% endblock %}

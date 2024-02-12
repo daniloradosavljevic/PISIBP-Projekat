@@ -3,16 +3,18 @@
 {% if msg %}
 {{ msg }}
 {% endif %}
-<h2>Dodaj komentar:</h2>
+<div class="container">
+    <h2 class="text-center py-3">Dodaj komentar:</h2>
 <form method="post" action="{{ url_for('komentarisi', vest_id=vest_id) }}">
-    <label for="ime">Ime:</label>
-    <input type="text" name="ime" required>
+    <label for="ime"></label>
+    <input type="text" name="ime" class="form-control"placeholder="Vase Ime" required>
     <br>
-    <label for="komentar">Komentar:</label>
-    <textarea name="komentar" rows="4" cols="50" required></textarea>
+    <label for="komentar">Komentar:</label><br>
+    <textarea name="komentar" rows="4" cols="50" required class="form-control"></textarea>
     <br>
-    <button type="submit">Dodaj komentar</button>
+    <button type="submit"class="btn btn-dark text-center my-3">Dodaj komentar</button>
 </form>
 
-<a href="{{ url_for('vest',vest_id=vest_id) }}" >Vrati se na vest</a>
+<a href="{{ url_for('vest',vest_id=vest_id) }}"class="btn btn-dark text-center">Vrati se na vest</a>
 {% endblock %}
+</div>
