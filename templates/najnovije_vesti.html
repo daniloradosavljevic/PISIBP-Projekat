@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <h1>Top Vesti</h1>
+
+  <h2>Top 4 najnovije vesti sa najviše lajkova:</h2>
+  <ul>
+    {% for vest in top_likes %}
+      <li>{{ vest['naziv'] }}</li>
+      <div>
+        {{ vest['sadrzaj'] | safe }}
+    </div>
+    {% endfor %}
+  </ul>
+
+  <h2>Najnovija vest iz kategorije Sport:</h2>
+  {% if sport_news %}
+    <p>{{ sport_news['naziv'] }}</p>
+  {% else %}
+    <p>Nema vesti u kategoriji Sport.</p>
+  {% endif %}
+
+  <h2>Najnovija vest iz kategorije Politika:</h2>
+  {% if politika_news %}
+    <p>{{ politika_news['naziv'] }}</p>
+  {% else %}
+    <p>Nema vesti u kategoriji Politika.</p>
+  {% endif %}
+
+  <h2>Najnovija vest iz kategorije Tehnologija:</h2>
+  {% if tehnologija_news %}
+    <p>{{ tehnologija_news['naziv'] }}</p>
+  {% else %}
+    <p>Nema vesti u kategoriji Tehnologija.</p>
+  {% endif %}
+
+{% endblock %}

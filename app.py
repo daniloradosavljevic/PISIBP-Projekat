@@ -770,6 +770,64 @@ def odbij_zahtev(id_zahteva):
         cursor.close()
         return redirect(url_for('prikaz_zahteva'))
 
+@app.route("/najnovije_vesti")
+def najnovije_vesti():
+    try:
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("""
+            SELECT n.*, COUNT(l.id_vesti) AS lajkovi
+            FROM novosti n
+            LEFT JOIN lajkovi_vesti l ON n.id = l.id_vesti
+            GROUP BY n.id
+            ORDER BY n.datum DESC, lajkovi DESC
+            LIMIT 4
+        """)
+        top_likes = cursor.fetchall()
+        procesuiraj_sadrzaj_vesti(top_likes)
+
+        cursor.execute("""
+            SELECT n.*
+            FROM novosti n
+            INNER JOIN kategorije k ON n.kategorija = k.id
+            WHERE k.naziv = 'sport'
+            ORDER BY n.datum DESC
+            LIMIT 1
+        """)
+        sport_news = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT n.*
+            FROM novosti n
+            INNER JOIN kategorije k ON n.kategorija = k.id
+            WHERE k.naziv = 'politika'
+            ORDER BY n.datum DESC
+            LIMIT 1
+        """)
+        politika_news = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT n.*
+            FROM novosti n
+            INNER JOIN kategorije k ON n.kategorija = k.id
+            WHERE k.naziv = 'tehnologija'
+            ORDER BY n.datum DESC
+            LIMIT 1
+        """)
+        tehnologija_news = cursor.fetchall()
+
+        return render_template(
+            "najnovije_vesti.html",
+            top_likes=top_likes,
+            sport_news=sport_news[0] if sport_news else None,
+            politika_news=politika_news[0] if politika_news else None,
+            tehnologija_news=tehnologija_news[0] if tehnologija_news else None,
+        )
+
+    except Exception as e:
+        print(e)
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
 
 
 if __name__ == "__main__":
