@@ -31,8 +31,9 @@
                         <a href="{{ url_for('izmeni_zaposlenog',zaposleni_id=zaposlen.id) }}">Izmeni</a>
                         {% if zaposlen.uloga != 1 %}
                         <a href="{{ url_for('ukloni_zaposlenog',zaposleni_id=zaposlen.id) }}"
-                        onclick="return confirm('Da li ste sigurni da želite da uklonite ovog zaposlenog?')"
+                        onclick="return confirm('Da li ste sigurni da želite da uklonite ovog zaposlenog?')"                        
                         >Ukloni</a>
+                        <a href="{{ url_for('dodeli_kategorije',novinar_id=zaposlen.id) }}">Dodeli kategorije</a>
                         {% endif %}
                     </td>
                 </tr>

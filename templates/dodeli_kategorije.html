@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <h1>Dodela kategorija za novinara: {{ novinar['username'] }}</h1>
+
+  <form method="POST" action="">
+    {% for kategorija in kategorije %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="kategorije" value="{{ kategorija[0] }}"
+          {% if kategorija[0] in kategorije_dodeljene_novinaru %} checked {% endif %}>
+        <label class="form-check-label" for="{{ kategorija[0] }}">
+          <p>{{ kategorija[1] }}</p>
+        </label>
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Sačuvaj promene</button>
+    <a href="{{ url_for('zaposleni') }}">Nazad na prikaz zaposlenih</a>
+
+  </form>
+{% endblock %}
