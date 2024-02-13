@@ -1,27 +1,20 @@
-{% extends 'base.html' %} {% block body %}
-<div align="center">
-
-        <div class="header">
-            <h1 class="word py-3">Login</h1>
-        </div>
-        </br>
-        </br>
-        </br>
-        <h2 class="word">
-            <form action="{{ url_for('login') }}" method="post">
-                <div class="msg">{{ msg }}</div>
-                <input id="username" name="username" type="text" placeholder="Enter Your Username" class="textbox" /></br>
-                </br>
-                <input id="password" name="password" type="password" placeholder="Enter Your Password" class="textbox" /></br>
-                </br>
-                </br>
-                <input type="submit" class="btn btn-lg btn-dark" value="Sign In"></br>
-                </br>
-                </br>
-                <a href="{{ url_for('prikaz_novosti') }}"class="btn btn-dark text-center btn-lg">Prikaz novosti</a>
-                <br>
-            </form>
-        </h2>
+{% extends 'base.html' %}
+{% block body %}
+<div class="bg-image">
+  <div class="container-fluid fw-bold"> 
+          <form action="{{ url_for('login') }}" method="post" class="mx-auto form_a">
+            <div class="header-text text-center">
+              <h1 class="h1_lr">Login</h1>
+            </div>
+            <div class="msg">{{ msg }}</div>
+              <div class="input-group mb-3">
+                <input id="username" name="username" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Enter Your Username" class="textbox"/>
+              </div>
+              <div class="input-group mb-3">
+                <input id="password" name="password" type="password" class="form-control form-control-lg bg-light fs-6" placeholder="Enter Your Password" class="textbox"/>
+              </div>
+              <input type="submit" class="btn btn-lg btn_1 w-100 fs-6" value="Sign In">
+          </form>
+  </div>
 </div>
-
 {% endblock %}
