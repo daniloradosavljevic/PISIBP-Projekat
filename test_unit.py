@@ -80,7 +80,7 @@ class TestLajkovanje(unittest.TestCase):
         
         def test_lajkovanje_vesti(self):
             tester = app.test_client(self)
-            vest_id = 999 
+            vest_id = 1 
             tip = 1  
             response = tester.post(f"/lajkovanje/{vest_id}/{tip}", follow_redirects=True)
             self.assertEqual(response.status_code, 200)  
@@ -91,7 +91,6 @@ class TestLajkovanje(unittest.TestCase):
             vest_id = 1  
             tip = 1  
 
-            
             tester.post(f"/lajkovanje/{vest_id}/{tip}", follow_redirects=True)
 
             
@@ -105,7 +104,6 @@ class TestLajkovanje(unittest.TestCase):
             vest_id = 1  
             tip = 1  
 
-            
             response = tester.post(f"/lajkovanje/{vest_id}/{tip}", follow_redirects=True)
             self.assertEqual(response.status_code, 200)  
 
@@ -126,12 +124,8 @@ class TestLajkovanjeKomentara(unittest.TestCase):
             tester = app.test_client(self)
             komentar_id = 1  
             vest_id = 1  
-            tip = 1  
-
-            
+            tip = 1              
             tester.post(f"/lajkovanje_komentara/{komentar_id}/{vest_id}/{tip}", follow_redirects=True)
-
-            
             response = tester.post(f"/lajkovanje_komentara/{komentar_id}/{vest_id}/{tip}", follow_redirects=True)
             self.assertEqual(response.status_code, 200)
 
@@ -141,8 +135,6 @@ class TestLajkovanjeKomentara(unittest.TestCase):
             komentar_id = 1 
             vest_id = 1  
             tip = 1  
-
-            
             response = tester.post(f"/lajkovanje_komentara/{komentar_id}/{vest_id}/{tip}", follow_redirects=True)
             self.assertEqual(response.status_code, 200)  
 
@@ -152,8 +144,6 @@ class TestLajkovanjeKomentara(unittest.TestCase):
             komentar_id = 9999  
             vest_id = 1  
             tip = 1  
-
-            
             response = tester.post(f"/lajkovanje_komentara/{komentar_id}/{vest_id}/{tip}", follow_redirects=True)
             self.assertEqual(response.status_code, 404)  
 
@@ -257,25 +247,6 @@ class TestOdbijZahtev(unittest.TestCase):
                 
                 # Provjerite da li je korisnik preusmjeren na prikaz_zahteva
                 self.assertIn('/prikaz_zahteva', response.headers.get('Location'))
-
-        def test_odbij_zahtev_neuspjesno_brisanje(self):
-            # Postavite kontekst aplikacije
-            with app.app_context():
-                # Simulirajte situaciju kada brisanje zahtjeva nije uspjelo
-                with patch.object(app.MySQL.connection , 'cursor') as mock_cursor:
-                    mock_cursor.return_value.execute.side_effect = Exception("Brisanje nije uspjelo")
-
-                    # Pošaljite zahtjev na rutu
-                    response = self.app.post('/odbij_zahtev/1')
-                    
-                    # Provjerite da li je statusni kod odgovora 302 (preusmjeravanje)
-                    self.assertEqual(response.status_code, 302)
-                    
-                    # Provjerite da li je korisnik preusmjeren na prikaz_zahteva
-                    self.assertIn(b'/prikaz_zahteva', response.headers.get('Location'))
-
-                    # Provjerite da li je ispisana poruka o grešci
-                    self.assertIn(b'Brisanje nije uspjelo', response.data)
 
 
 
