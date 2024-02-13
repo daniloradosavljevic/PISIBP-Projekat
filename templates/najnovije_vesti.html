@@ -10,7 +10,8 @@
     {% if top_likes %}
     <div class="col-lg-8">
       <div class="d-flex justify-content-center">
-        <div class="bg-image rounded" style="background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp'); height: 557px; width: 600px;">
+        <div class="bg-image rounded">
+          {{ vest['sadrzaj'] | replace('width="', '') | replace('height="', '') | replace('<img ', '<img style="width: 557px; height: 600px;" ') | safe}}
           <div class="mask" style="background-color: rgba(0, 0, 0, 0.6);">
             <div class="d-flex">
               <h1>{{ top_likes[0]['naziv'] }}</h1>
@@ -147,25 +148,4 @@
       </div>
     </div>
   </section>
-            {% if ulogovan == True %}
-        </div>
-        </br>
-        </br>
-        </br>
-        <h1 class="bottom">
-            Zdravo {{session.username}}!!</br>
-            </br> Dobrodosao
-        </h1>
-
-        </br>
-        <a href="{{ url_for('cms') }}" class="btn">CMS</a>
-        </br>
-        <a href="{{ url_for('prikaz_novosti') }}">Prikaz novosti</a>
-        </br>
-        <a href="{{ url_for('pregled_novosti') }}">Pregled novosti</a>
-        <!-- Add link to new page -->
-        </br>
-        <a href="{{ url_for('logout') }}" class="btn">Logout</a> {% endif %}
-    </div>
-</div>
 {% endblock %}

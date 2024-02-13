@@ -7,24 +7,24 @@
                 <a href="{{ url_for('cms') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                     <i class="fa-solid fa-person-digging text-white"></i><span class="fs-5 d-none d-sm-inline px-3">Meni</span>
                 </a>
-                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-                    <li>
-                        <a href="{{ url_for('zaposleni') }}" class="nav-link px-0 align-middle">
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start ulAnimacija" id="menu">
+                    <li class="liAnimacija">
+                        <a href="{{ url_for('zaposleni') }}" class="nav-link px-0 align-middle ulhover">
                             <i class="fa-solid fa-people-roof text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lista zaposlenih</span> </a>
                     </li>
-                    <li>
+                    <li class="liAnimacija">
                         <a href="{{ url_for('kreiraj_novosti') }}" class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-file-circle-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Kreiraj novosti</span></a>
                     </li>
-                    <li>
+                    <li class="liAnimacija">
                         <a href="{{ url_for('pregled_novosti') }}"  class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz novosti</span></a>
                     </li>
-                    <li>
+                    <li class="liAnimacija">
                         <a href="{{ url_for('prikaz_kategorija') }}"  class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-list text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz kategorija</span></a>
                     </li>
-                    <li>
+                    <li class="liAnimacija">
                         <a href="{{ url_for('prikaz_zahteva') }}"  class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-bell text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz zahteva</span></a>
                     </li>
@@ -35,14 +35,20 @@
                         <span class="d-none d-sm-inline mx-1">Korisnik</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                        <li><a class="dropdown-item" href="#">Nazad na sajt</a></li>
-                        <li><a class="dropdown-item" href="#">Odjavi se</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('najnovije_vesti') }}">Nazad na sajt</a></li>
+                        <li><a href="{{ url_for('logout') }}" class="dropdown-item text-light btn">Logout</a> </li>
                     </ul>
                 </div>
             </div>
         </div>
         <div class="col py-3">
-            <h1 class="text-center">Dobrodošao na naš Content Managment System (CMS)!</h1>
+            <h1 class="bottom text-center">
+                Zdravo {{session.username}}!!</br>
+                </br>
+            </h1>
+            <h1 class="text-center">Dobrodošao na naš Content Managment System (CMS)!</h1><br>
+          
+            
         </div>
     </div>
 </div>

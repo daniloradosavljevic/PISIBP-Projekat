@@ -6,13 +6,14 @@
 </br>
 <div class="container">
   <div class="row">
-    <h1 class="text-center">Top Vesti</h1>
+    <h1 class="text-center mb-5 animacija1 text-light py-2 rounded-pill bg-dark">Top Vesti</h1>
     <div class="col-lg-8">
       <div class="d-flex justify-content-center">
-        <div class="bg-image rounded" style="background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp'); height: 557px; width: 600px;">
+        <div class="bg-image rounded shake" style="background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp'); height: 557px; width: 600px;">
+
           <div class="mask" style="background-color: rgba(0, 0, 0, 0.6);">
-            <div class="d-flex">
-              <h1 class="text-light">Udarna vest</h1>
+            <div class="d-flex ">
+              <h1 class="text-light">Udarna</h1>
             </div>
           </div>
         </div>
@@ -41,7 +42,7 @@
                 </div>
                 <div class="container">
                   <div class="p-5 text-center bg-body-tertiary">
-                    <h1 class="py-3 display-4 border rounded-pill text-white bg-dark">Najnovije vesti</h1>
+                    <h1 class="py-3 display-4 border rounded-pill text-white bg-dark animacija1">Najnovije vesti</h1>
                   </div>
                 </div>
 
@@ -144,25 +145,5 @@
       </div>
     </div>
   </section>
-            {% if ulogovan == True %}
-        </div>
-        </br>
-        </br>
-        </br>
-        <h1 class="bottom">
-            Zdravo {{session.username}}!!</br>
-            </br> Dobrodosao
-        </h1>
-
-        </br>
-        <a href="{{ url_for('cms') }}" class="btn">CMS</a>
-        </br>
-        <a href="{{ url_for('prikaz_novosti') }}">Prikaz novosti</a>
-        </br>
-        <a href="{{ url_for('pregled_novosti') }}">Pregled novosti</a>
-        <!-- Add link to new page -->
-        </br>
-        <a href="{{ url_for('logout') }}" class="btn">Logout</a> {% endif %}
-    </div>
-</div>
+       
 {% endblock %}
