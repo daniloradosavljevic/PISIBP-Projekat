@@ -4,31 +4,31 @@
       <div class="col-lg-3 d-none d-lg-block">
         <div class="card bg-dark text-white text-center">
           <div class="card-body">
-            <h2>Kategorije</h2>
+            <h2 class="">Kategorije</h2>
             <ul class="navbar-nav" data-toggle="animation" data-animation="zoom-in" data-animation-start="onLoad">
                 <li class="nav-item py-2 ">
-                    <a href="" class="nav-link text-light" >Kategorija1</a>
+                    <a href="" class="nav-link text-light zoom" >Kategorija1</a>
                 </li>
                 <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija2</a>
+                    <a href="" class="nav-link text-light zoom">Kategorija2</a>
                 </li>
                 <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija3</a>
+                    <a href="" class="nav-link text-light zoom">Kategorija3</a>
                 </li>
                 <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija4</a>
+                    <a href="" class="nav-link text-light zoom">Kategorija4</a>
                 </li>
                 <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija5</a>
+                    <a href="" class="nav-link text-light zoom">Kategorija5</a>
                 </li>
                 <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija6</a>
+                    <a href="" class="nav-link text-light zoom">Kategorija6</a>
                 </li>
                 <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija7</a>
+                    <a href="" class="nav-link text-light zoom">Kategorija7</a>
                 </li>
                 <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija8</a>
+                    <a href="" class="nav-link text-light zoom">Kategorija8</a>
                 </li>
                 <li class="nav-item py-2">
                     <a href="" class="nav-link text-light">Kategorija9</a>
@@ -48,10 +48,10 @@
             <i class="fas fa-search"></i>
           </span>
         </form><br>
-        <main role="main" class="container-fluid d-none d-xl-block">
+        <main role="main" class="container-fluid d-none d-xl-block ">
           {% for vest in novosti %}
           <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="card-link" style="text-decoration: none;">
-              <div class="card mb-4">
+              <div class="card mb-4 zoom">
                   <div class="row no-gutters">
       
                       <div class="col-md-7">

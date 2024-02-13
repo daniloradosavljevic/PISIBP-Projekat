@@ -208,7 +208,15 @@ def kreiraj_novosti():
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT id, naziv FROM kategorije")
+    if session["uloga"] == 1:
+        cursor.execute("SELECT id, naziv FROM kategorije")
+    else:
+        cursor.execute("""
+            SELECT kategorije.id, kategorije.naziv
+            FROM kategorije
+            JOIN novinari_kategorije ON kategorije.id = novinari_kategorije.kategorija_id
+            WHERE novinari_kategorije.novinar_id = %s
+        """, (session["id"],))    
     categories = cursor.fetchall()
 
     if request.method == "POST":
@@ -829,6 +837,40 @@ def najnovije_vesti():
     finally:
         cursor.close()
 
+
+@app.route('/dodeli_kategorije/novinar:<int:novinar_id>', methods=['GET', 'POST'])
+def dodeli_kategorije(novinar_id):
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+        return redirect(url_for("home"))
+
+    cursor = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        kategorije = request.form.getlist('kategorije')
+
+        cursor.execute("DELETE FROM novinari_kategorije WHERE novinar_id = %s", (novinar_id,))
+
+        for kategorija_id in kategorije:
+            cursor.execute("INSERT INTO novinari_kategorije (novinar_id, kategorija_id) VALUES (%s, %s)", (novinar_id, kategorija_id))
+        mysql.connection.commit()
+
+        return redirect(url_for('zaposleni'))
+
+    cursor.execute("SELECT * FROM accounts WHERE id = %s AND uloga != 1", (novinar_id,))
+    novinar = cursor.fetchone()
+
+    if not novinar:
+        return redirect(url_for('home'))
+
+    cursor.execute("SELECT kategorije.id, kategorije.naziv FROM kategorije JOIN novinari_kategorije ON kategorije.id = novinari_kategorije.kategorija_id WHERE novinari_kategorije.novinar_id = %s", (novinar_id,))
+    kategorije_dodeljene_novinaru = cursor.fetchall()
+    kategorije_ids = [kategorija[0] for kategorija in kategorije_dodeljene_novinaru]
+
+
+    cursor.execute("SELECT * FROM kategorije") 
+    kategorije = cursor.fetchall()
+
+    return render_template('dodeli_kategorije.html', novinar=novinar, kategorije=kategorije, kategorije_dodeljene_novinaru=kategorije_ids)
 
 if __name__ == "__main__":
     app.run(debug=True)

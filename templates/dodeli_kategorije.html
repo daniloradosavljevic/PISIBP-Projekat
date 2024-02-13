@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block body %}
+
+  {% extends 'base.html' %} {% block body %}
 {% if session['uloga'] == 1 %}
 <div class="container-fluid">
     <div class="row flex-nowrap">
@@ -42,14 +43,26 @@
             </div>
         </div>
         <div class="col py-3">
-            <h1 class="bottom text-center">
-                Zdravo {{session.username}}!!</br>
-                </br>
-            </h1>
-            <h1 class="text-center">Dobrodošao na naš Content Managment System (CMS)!</h1><br>
-          
-            
+          <div align="center">
+          <h1 class="text-center">Dodela kategorija za novinara: {{ novinar['username'] }}</h1>
+          <form method="POST" action="">
+            {% for kategorija in kategorije %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="kategorije" value="{{ kategorija[0] }}"
+                  {% if kategorija[0] in kategorije_dodeljene_novinaru %} checked {% endif %}>
+                <label class="form-check-label" for="{{ kategorija[0] }}">
+                  <p class="text-center">{{ kategorija[1] }}</p>
+                </label>
+              </div>
+            {% endfor %}
+        
+            <button type="submit" class="btn btn-black">Sačuvaj promene</button>
+            <a href="{{ url_for('zaposleni') }}" class="btn btn-black mt-1">Nazad na prikaz zaposlenih</a>
+        
+          </form>
+          </div>
         </div>
     </div>
 </div>
 {% endif %} {% endblock %}
+{% endblock %}
