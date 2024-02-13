@@ -7,28 +7,31 @@
 <div class="container">
   <div class="row">
     <h1 class="text-center p-3 mb-5 bg-dark rounded-pill text-white">Top Vesti</h1>
+    {% if top_likes %}
     <div class="col-lg-8">
       <div class="d-flex justify-content-center">
         <div class="bg-image rounded" style="background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp'); height: 557px; width: 600px;">
           <div class="mask" style="background-color: rgba(0, 0, 0, 0.6);">
             <div class="d-flex">
-              <h1 class="text-light">Udarna vest</h1>
+              <h1>{{ top_likes[0]['naziv'] }}</h1>
+              <p align="right"><a href="{{ url_for('vest',vest_id=top_likes[0]['id']) }}" class="btn text-light" role="button">Vidi jos</a></p>
             </div>
           </div>
         </div>
       </div>
     </div>
+  {% endif %}
     <div class="col-lg-4 d-none d-lg-block justify-content-center">
       <div class="card bg-dark text-white">
         <div class="card-body">
           <h2>Top 4 najnovije vesti sa najviše lajkova:</h2>
-          {% for vest in top_likes %}
+          {% for vest in top_likes[1:] %}
                       <div class="d-flex border-bottom-blue pt-3 pb-4 align-items-center justify-content-between">
                         <div class=" pr-3 flex-grow-1">
                           <h5>{{ vest['naziv'] }}</h5>
                           
                           <div class="fs-12">
-                              <p align="right"><a href="#link" class="btn text-light" role="button">Vidi jos</a></p>
+                              <p align="right"><a href="{{ url_for('vest',vest_id=vest['id']) }}" class="btn text-light" role="button">Vidi jos</a></p>
                             <hr>
                           </div>
                         </div>

@@ -398,7 +398,7 @@ def vest(vest_id):
             "kategorija": rezultat[0].get("kategorija"),
             "sadrzaj": rezultat[0].get("sadrzaj"),
             "datum": rezultat[0].get("datum"),
-            "tagovi": rezultat[0].get("tagovi"),  # Added tags to vest_data
+            "tagovi": rezultat[0].get("tagovi"),  
             "author_username": rezultat[0].get("author_username"),
             "komentari": list(komentari.values()),
         }
