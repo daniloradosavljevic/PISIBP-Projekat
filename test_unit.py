@@ -165,9 +165,9 @@ class TestZatraziOdobrenje(unittest.TestCase):
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
                 sess["id"] = 1  
-            vest_id = 1  
-            response = tester.get(f"/cms/zatrazi_odobrenje/{vest_id}", follow_redirects=True)
-            self.assertEqual(response.status_code, 200)  
+                vest_id = 1  
+                response = tester.get(f"/cms/zatrazi_odobrenje/{vest_id}", follow_redirects=True)
+                self.assertEqual(response.status_code, 200)  
 
             
 
@@ -183,9 +183,9 @@ class TestZatraziOdobrenje(unittest.TestCase):
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
                 sess["id"] = 1  
-            vest_id = 9999  
-            response = tester.get(f"/cms/zatrazi_odobrenje/{vest_id}", follow_redirects=True)
-            self.assertEqual(response.status_code, 404) 
+                vest_id = 9999  
+                response = tester.get(f"/cms/zatrazi_odobrenje/{vest_id}", follow_redirects=True)
+                self.assertEqual(response.status_code, 404) 
 
 class TestZatraziIzmenu(unittest.TestCase):
 
@@ -195,12 +195,11 @@ class TestZatraziIzmenu(unittest.TestCase):
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
                 sess["id"] = 1  # Postavite ID korisnika prema vašem testnom scenariju
-            vest_id = 1  # Postavite ID vesti za koju želite zatražiti izmenu
-            zahtev_tip = "Izmena"  # Postavite željeni tip zahtjeva
-            response = tester.get(f"/cms/zatrazi_izmenu/{vest_id}?zahtev={zahtev_tip}", follow_redirects=True)
-            self.assertEqual(response.status_code, 200)  # Provjerite da li je korisnik preusmjeren na stranicu za pregled novosti
+                vest_id = 1  # Postavite ID vesti za koju želite zatražiti izmenu
+                zahtev_tip = "Izmena"  # Postavite željeni tip zahtjeva
+                response = tester.get(f"/cms/zatrazi_izmenu/{vest_id}?zahtev={zahtev_tip}", follow_redirects=True)
+                self.assertEqual(response.status_code, 200)  # Provjerite da li je korisnik preusmjeren na stranicu za pregled novosti
 
-            # Provjerite da li je zahtjev za izmenu uspješno dodan u bazu podataka (možete provjeriti direktno u bazi ili koristiti odgovarajući SQL upit za provjeru)
 
 
         # Testiranje zahtjeva za izmenu vesti koja ne postoji
@@ -209,10 +208,10 @@ class TestZatraziIzmenu(unittest.TestCase):
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
                 sess["id"] = 1  # Postavite ID korisnika prema vašem testnom scenariju
-            ne_postojeca_vest_id = 9999  # Postavite ID nepostojeće vesti
-            zahtev_tip = "Izmena"  # Postavite željeni tip zahtjeva
-            response = tester.get(f"/cms/zatrazi_izmenu/{ne_postojeca_vest_id}?zahtev={zahtev_tip}", follow_redirects=True)
-            self.assertEqual(response.status_code, 404)  # Provjerite da li je korisnik preusmjeren na stranicu za pregled novosti
+                ne_postojeca_vest_id = 9999  # Postavite ID nepostojeće vesti
+                zahtev_tip = "Izmena"  # Postavite željeni tip zahtjeva
+                response = tester.get(f"/cms/zatrazi_izmenu/{ne_postojeca_vest_id}?zahtev={zahtev_tip}", follow_redirects=True)
+                self.assertEqual(response.status_code, 404)  # Provjerite da li je korisnik preusmjeren na stranicu za pregled novosti
 
 class TestOdobriZahtev(unittest.TestCase):
 
@@ -222,10 +221,10 @@ class TestOdobriZahtev(unittest.TestCase):
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
                 sess["uloga"] = 1  # Postavite ulogu korisnika prema vašem testnom scenariju
-            id_zahteva = 1  # Postavite ID zahtjeva koji želite odobriti
-            tip_zahteva = "Odobrenje"
-            response = tester.post(f"/cms/odobri_zahtev/{id_zahteva}/{tip_zahteva}", follow_redirects=True)
-            self.assertEqual(response.status_code, 200)  # Provjerite da li je korisnik preusmjeren
+                id_zahteva = 1  # Postavite ID zahtjeva koji želite odobriti
+                tip_zahteva = "Odobrenje"
+                response = tester.post(f"/cms/odobri_zahtev/{id_zahteva}/{tip_zahteva}", follow_redirects=True)
+                self.assertEqual(response.status_code, 200)  # Provjerite da li je korisnik preusmjeren
 
             # Provjerite da li je zahtjev uspješno odobren (možete provjeriti direktno u bazi ili koristiti odgovarajući SQL upit za provjeru)
 
@@ -235,43 +234,48 @@ class TestOdobriZahtev(unittest.TestCase):
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
                 sess["uloga"] = 2  # Postavite ulogu korisnika prema vašem testnom scenariju
-            id_zahteva = 1  # Postavite ID zahtjeva koji želite odobriti
-            tip_zahteva = "Izmena"
-            response = tester.post(f"/cms/odobri_zahtev/{id_zahteva}/{tip_zahteva}", follow_redirects=True)
-            self.assertEqual(response.status_code, 200)  # Provjerite da li je korisnik preusmjeren
+                id_zahteva = 1  # Postavite ID zahtjeva koji želite odobriti
+                tip_zahteva = "Izmena"
+                response = tester.post(f"/cms/odobri_zahtev/{id_zahteva}/{tip_zahteva}", follow_redirects=True)
+                self.assertEqual(response.status_code, 200)  # Provjerite da li je korisnik preusmjeren
 
 class TestOdbijZahtev(unittest.TestCase):
+        
         def setUp(self):
             # Pripremite testnu konfiguraciju ili postavite testnu aplikaciju
             app.testing = True
             self.app = app.test_client()
 
         def test_odbij_zahtev(self):
-            # Pošaljite zahtjev na rutu
-            response = self.app.post('/odbij_zahtev/1')
-            
-            # Provjerite da li je statusni kod odgovora 302 (preusmjeravanje)
-            self.assertEqual(response.status_code, 302)
-            
-            # Provjerite da li je korisnik preusmjeren na prikaz_zahteva
-            self.assertIn(b'/prikaz_zahteva', response.headers.get('Location'))
-
-        def test_odbij_zahtev_neuspjesno_brisanje(self):
-            # Simulirajte situaciju kada brisanje zahtjeva nije uspjelo
-            with patch('app.mysql.connection.cursor') as mock_cursor:
-                mock_cursor.return_value.execute.side_effect = Exception("Brisanje nije uspjelo")
-
-                # Pošaljite zahtjev na rutu
+            # Postavite kontekst aplikacije
+            with app.app_context():
+                # Pošaljite zahtjev na rutu   
                 response = self.app.post('/odbij_zahtev/1')
                 
                 # Provjerite da li je statusni kod odgovora 302 (preusmjeravanje)
                 self.assertEqual(response.status_code, 302)
                 
                 # Provjerite da li je korisnik preusmjeren na prikaz_zahteva
-                self.assertIn(b'/prikaz_zahteva', response.headers.get('Location'))
+                self.assertIn('/prikaz_zahteva', response.headers.get('Location'))
 
-                # Provjerite da li je ispisana poruka o grešci
-                self.assertIn(b'Brisanje nije uspjelo', response.data)
+        def test_odbij_zahtev_neuspjesno_brisanje(self):
+            # Postavite kontekst aplikacije
+            with app.app_context():
+                # Simulirajte situaciju kada brisanje zahtjeva nije uspjelo
+                with patch.object(app.MySQL.connection , 'cursor') as mock_cursor:
+                    mock_cursor.return_value.execute.side_effect = Exception("Brisanje nije uspjelo")
+
+                    # Pošaljite zahtjev na rutu
+                    response = self.app.post('/odbij_zahtev/1')
+                    
+                    # Provjerite da li je statusni kod odgovora 302 (preusmjeravanje)
+                    self.assertEqual(response.status_code, 302)
+                    
+                    # Provjerite da li je korisnik preusmjeren na prikaz_zahteva
+                    self.assertIn(b'/prikaz_zahteva', response.headers.get('Location'))
+
+                    # Provjerite da li je ispisana poruka o grešci
+                    self.assertIn(b'Brisanje nije uspjelo', response.data)
 
 
 
