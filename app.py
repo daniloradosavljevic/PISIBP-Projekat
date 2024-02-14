@@ -211,12 +211,15 @@ def kreiraj_novosti():
     if session["uloga"] == 1:
         cursor.execute("SELECT id, naziv FROM kategorije")
     else:
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT kategorije.id, kategorije.naziv
             FROM kategorije
             JOIN novinari_kategorije ON kategorije.id = novinari_kategorije.kategorija_id
             WHERE novinari_kategorije.novinar_id = %s
-        """, (session["id"],))    
+        """,
+            (session["id"],),
+        )
     categories = cursor.fetchall()
 
     if request.method == "POST":
@@ -335,8 +338,15 @@ def prikaz_novosti():
     params = []
 
     if search_query:
-        query += " AND (novosti.naziv LIKE %s OR novosti.sadrzaj LIKE %s)"
-        params.extend([f"%{search_query}%", f"%{search_query}%"])
+        query += " AND (novosti.naziv LIKE %s OR novosti.sadrzaj LIKE %s OR novosti.tagovi LIKE %s OR novosti.datum LIKE %s)"
+        params.extend(
+            [
+                f"%{search_query}%",
+                f"%{search_query}%",
+                f"%{search_query}%",
+                f"%{search_query}%",
+            ]
+        )
 
     if category:
         query += " AND novosti.kategorija = %s"
@@ -406,7 +416,7 @@ def vest(vest_id):
             "kategorija": rezultat[0].get("kategorija"),
             "sadrzaj": rezultat[0].get("sadrzaj"),
             "datum": rezultat[0].get("datum"),
-            "tagovi": rezultat[0].get("tagovi"),  
+            "tagovi": rezultat[0].get("tagovi"),
             "author_username": rezultat[0].get("author_username"),
             "komentari": list(komentari.values()),
         }
@@ -459,16 +469,16 @@ def inject_functions():
     )
 
 
-@app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["GET","POST"])
+@app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["GET", "POST"])
 def lajkovanje(vest_id, tip):
     public_ip = ip.get()
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-    cursor.execute('SELECT * FROM novosti WHERE id = %s' % vest_id)
+    cursor.execute("SELECT * FROM novosti WHERE id = %s" % vest_id)
     postoji_vest = cursor.fetchone()
-    
+
     if not postoji_vest:
-        return redirect(url_for('home'))
+        return redirect(url_for("home"))
 
     cursor.execute(
         "SELECT * FROM lajkovi_vesti WHERE id_vesti = %s AND ip_adresa = %s",
@@ -713,9 +723,9 @@ def zatrazi_izmenu(vest_id):
     if not vest:
         return redirect(url_for("pregled_novosti"))
 
-    zahtev_tip = request.args.get("zahtev") 
+    zahtev_tip = request.args.get("zahtev")
 
-    if zahtev_tip not in ['Izmena', 'Brisanje']:
+    if zahtev_tip not in ["Izmena", "Brisanje"]:
         return redirect(url_for("pregled_novosti"))
 
     cursor.execute(
@@ -740,7 +750,8 @@ def zatrazi_izmenu(vest_id):
 
     return redirect(url_for("pregled_novosti"))
 
-@app.route("/cms/prikaz_zahteva",methods=["GET", "POST"])
+
+@app.route("/cms/prikaz_zahteva", methods=["GET", "POST"])
 def prikaz_zahteva():
     if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
         return redirect(url_for("home"))
@@ -751,26 +762,35 @@ def prikaz_zahteva():
 
     return render_template("prikaz_zahteva.html", zahtevi=zahtevi)
 
-@app.route("/cms/odobri_zahtev/<int:id_zahteva>/<string:tip_zahteva>",methods=["GET","POST"])
+
+@app.route(
+    "/cms/odobri_zahtev/<int:id_zahteva>/<string:tip_zahteva>", methods=["GET", "POST"]
+)
 def odobri_zahtev(id_zahteva, tip_zahteva):
     if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
 
-    if tip_zahteva == 'Odobrenje':
-        cursor.execute("UPDATE novosti n JOIN zahtevi z ON n.id = z.id_novosti SET n.status = 1 WHERE z.id = %s", (id_zahteva,))
-    elif tip_zahteva == 'Izmena':
-        cursor.execute("UPDATE novosti n JOIN zahtevi z ON n.id = z.id_novosti SET n.status = 0 WHERE z.id = %s", (id_zahteva,))
+    if tip_zahteva == "Odobrenje":
+        cursor.execute(
+            "UPDATE novosti n JOIN zahtevi z ON n.id = z.id_novosti SET n.status = 1 WHERE z.id = %s",
+            (id_zahteva,),
+        )
+    elif tip_zahteva == "Izmena":
+        cursor.execute(
+            "UPDATE novosti n JOIN zahtevi z ON n.id = z.id_novosti SET n.status = 0 WHERE z.id = %s",
+            (id_zahteva,),
+        )
     else:
         return redirect(url_for("prikaz_zahteva"))
 
     mysql.connection.commit()
 
-    return redirect(url_for('odbij_zahtev', id_zahteva=id_zahteva))
+    return redirect(url_for("odbij_zahtev", id_zahteva=id_zahteva))
 
 
-@app.route('/odbij_zahtev/<int:id_zahteva>', methods=["GET","POST"])
+@app.route("/odbij_zahtev/<int:id_zahteva>", methods=["GET", "POST"])
 def odbij_zahtev(id_zahteva):
     cursor = mysql.connection.cursor()
 
@@ -778,55 +798,64 @@ def odbij_zahtev(id_zahteva):
         cursor.execute("DELETE FROM zahtevi WHERE id = %s", (id_zahteva,))
         mysql.connection.commit()
         cursor.close()
-        return redirect(url_for('prikaz_zahteva'))
+        return redirect(url_for("prikaz_zahteva"))
     except Exception as e:
         print(f"Error: {e}")
         cursor.close()
-        return redirect(url_for('prikaz_zahteva'))
+        return redirect(url_for("prikaz_zahteva"))
+
 
 @app.route("/najnovije_vesti")
 def najnovije_vesti():
     try:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT n.*, COUNT(l.id_vesti) AS lajkovi
             FROM novosti n
             LEFT JOIN lajkovi_vesti l ON n.id = l.id_vesti
             GROUP BY n.id
             ORDER BY n.datum DESC, lajkovi DESC
             LIMIT 4
-        """)
+        """
+        )
         top_likes = cursor.fetchall()
         procesuiraj_sadrzaj_vesti(top_likes)
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
             WHERE k.naziv = 'sport'
             ORDER BY n.datum DESC
             LIMIT 1
-        """)
+        """
+        )
         sport_news = cursor.fetchall()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
             WHERE k.naziv = 'politika'
             ORDER BY n.datum DESC
             LIMIT 1
-        """)
+        """
+        )
         politika_news = cursor.fetchall()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
             WHERE k.naziv = 'tehnologija'
             ORDER BY n.datum DESC
             LIMIT 1
-        """)
+        """
+        )
         tehnologija_news = cursor.fetchall()
 
         return render_template(
@@ -839,44 +868,57 @@ def najnovije_vesti():
 
     except Exception as e:
         print(e)
-        return redirect(url_for('home'))
+        return redirect(url_for("home"))
     finally:
         cursor.close()
 
 
-@app.route('/dodeli_kategorije/novinar:<int:novinar_id>', methods=['GET', 'POST'])
+@app.route("/dodeli_kategorije/novinar:<int:novinar_id>", methods=["GET", "POST"])
 def dodeli_kategorije(novinar_id):
     if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
 
-    if request.method == 'POST':
-        kategorije = request.form.getlist('kategorije')
+    if request.method == "POST":
+        kategorije = request.form.getlist("kategorije")
 
-        cursor.execute("DELETE FROM novinari_kategorije WHERE novinar_id = %s", (novinar_id,))
+        cursor.execute(
+            "DELETE FROM novinari_kategorije WHERE novinar_id = %s", (novinar_id,)
+        )
 
         for kategorija_id in kategorije:
-            cursor.execute("INSERT INTO novinari_kategorije (novinar_id, kategorija_id) VALUES (%s, %s)", (novinar_id, kategorija_id))
+            cursor.execute(
+                "INSERT INTO novinari_kategorije (novinar_id, kategorija_id) VALUES (%s, %s)",
+                (novinar_id, kategorija_id),
+            )
         mysql.connection.commit()
 
-        return redirect(url_for('zaposleni'))
+        return redirect(url_for("zaposleni"))
 
     cursor.execute("SELECT * FROM accounts WHERE id = %s AND uloga != 1", (novinar_id,))
     novinar = cursor.fetchone()
 
     if not novinar:
-        return redirect(url_for('home'))
+        return redirect(url_for("home"))
 
-    cursor.execute("SELECT kategorije.id, kategorije.naziv FROM kategorije JOIN novinari_kategorije ON kategorije.id = novinari_kategorije.kategorija_id WHERE novinari_kategorije.novinar_id = %s", (novinar_id,))
+    cursor.execute(
+        "SELECT kategorije.id, kategorije.naziv FROM kategorije JOIN novinari_kategorije ON kategorije.id = novinari_kategorije.kategorija_id WHERE novinari_kategorije.novinar_id = %s",
+        (novinar_id,),
+    )
     kategorije_dodeljene_novinaru = cursor.fetchall()
     kategorije_ids = [kategorija[0] for kategorija in kategorije_dodeljene_novinaru]
 
-
-    cursor.execute("SELECT * FROM kategorije") 
+    cursor.execute("SELECT * FROM kategorije")
     kategorije = cursor.fetchall()
 
-    return render_template('dodeli_kategorije.html', novinar=novinar, kategorije=kategorije, kategorije_dodeljene_novinaru=kategorije_ids)
+    return render_template(
+        "dodeli_kategorije.html",
+        novinar=novinar,
+        kategorije=kategorije,
+        kategorije_dodeljene_novinaru=kategorije_ids,
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
