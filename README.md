@@ -18,4 +18,5 @@ Uputstvo za pokretanje aplikacije:
 - Importujte bazu podataka, tako što ćete kreirati bazu sa nazivom "baze" i prekopirati tekst iz bazapodataka.txt u SQL tab
 - Kreirajte 9125 članaka u terminalu sa - python skripta.py
 - Pokrenite aplikaciju u terminalu korišćenjem: python app.py
+  
 NAPOMENA: Što se tiče Devops-a, napravljeni su odvojeni kontejneri za Flask Aplikaciju i MySQL bazu podataka, ali nije uspešno rešen problem pri povezivanju ove dve komponente (Funkcioniše sa određenim stranicama, ali ne sa onim koje koriste bazu podataka). Verovatano je zbog verzija Pythona i MySQL-a. 
