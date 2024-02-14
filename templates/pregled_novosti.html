@@ -64,20 +64,20 @@
     <p><strong>Status:</strong>
         {% if vest['status'] == 0 %}
             Neodobreno
-            <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id']) }}" onclick="showAlert('Zahtev za odobrenje je poslat.')" class="btn btn-dark text-center">Zatraži odobrenje</a>
+            <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id']) }}" onclick="showAlert('Zahtev za odobrenje je poslat.')" class="btn btn-dark text-center zoom">Zatraži odobrenje</a>
         {% else %}
             Odobreno
             
-            <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Izmena') }}" onclick="showAlert('Zahtev za izmenu je poslat.')" class="btn btn-dark text-center">Zatraži izmenu</a>
-            <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Brisanje') }}" onclick="showAlert('Zahtev za brisanje je poslat.')" class="btn btn-dark text-center">Zatraži brisanje</a>
+            <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Izmena') }}" onclick="showAlert('Zahtev za izmenu je poslat.')" class="btn btn-dark text-center zoom">Zatraži izmenu</a>
+            <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Brisanje') }}" onclick="showAlert('Zahtev za brisanje je poslat.')" class="btn btn-dark text-center zoom">Zatraži brisanje</a>
         {% endif %}
     </p>
     <div class="text-center">
-        <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="btn btn-dark text-center">Pročitaj više</a>
+        <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="btn btn-dark text-center zoom">Pročitaj više</a>
     {% if vest['status'] == 0 %}
-        <a href="{{ url_for('izmeni_novost', novost_id=vest['id']) }}" class="btn btn-dark text-center">Izmeni vest</a>
+        <a href="{{ url_for('izmeni_novost', novost_id=vest['id']) }}" class="btn btn-dark text-center zoom">Izmeni vest</a>
     {% endif %}
-    <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')" class="btn btn-dark text-center">Obrisi vest</a>
+    <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')" class="btn btn-dark text-center zoom">Obrisi vest</a>
     <hr>
     </div>
     
@@ -86,10 +86,10 @@
 
 <div>
     {% if stranica > 1 %}
-        <a href="{{ url_for('pregled_novosti', stranica=stranica-1) }}">Prethodna stranica</a>
+    <a href="{{ url_for('prikaz_novosti', stranica=stranica-1) }}" class="btn  mb-3"><i class="fa-solid fa-arrow-left fa-bounce"></i></a>
     {% endif %}
     {% if novosti|length >= rezultati_po_stranici %}
-        <a href="{{ url_for('pregled_novosti', stranica=stranica+1) }}">Sledeća stranica</a>
+    <a href="{{ url_for('prikaz_novosti', stranica=stranica+1) }}" class="btn  mb-3"><i class="fa-solid fa-arrow-right fa-bounce"></i></a>
     {% endif %}
 </div>
         </div>

@@ -18,6 +18,27 @@
 
                 </p>
             </div>
+            <div class="d-flex flex-row align-items-center text-light text-center">
+                <form action="{{ url_for('lajkovanje', vest_id=vest.id, tip=0) }}" method="post" class="btn text-light">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-thumbs-up"></i>
+                        <button type="submit" class="btn btn-white {% if lajkovanje_info == 0 %}btn-success{% endif %}">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </button>
+                        <span class="icon-label ml-2 text-dark">{{ broj_lajkova(vest.id, 0) }}</span>
+                    </div>
+                </form>
+            
+                <form action="{{ url_for('lajkovanje', vest_id=vest.id, tip=1) }}" method="post">
+                    <div class="d-flex align-items-center">
+                      
+                        <button type="submit" class="btn btn-white ml-2 {% if lajkovanje_info == 1 %} btn-danger {% endif %}">
+                            <i class="fa-solid fa-thumbs-down"></i> 
+                        </button>
+                        <span class="icon-label ml-2 text-dark">{{ broj_lajkova(vest.id, 1) }}</span>
+                    </div>
+                </form>
+            </div>
         </article>
 
     </div>
