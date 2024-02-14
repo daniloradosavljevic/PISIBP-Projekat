@@ -143,7 +143,7 @@ def register():
 
 @app.route("/cms/zaposleni")
 def zaposleni():
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -393,7 +393,7 @@ def vest(vest_id):
     INNER JOIN accounts ON novosti.id_autora = accounts.id
     LEFT JOIN komentari ON novosti.id = komentari.vest_id
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
-    WHERE novosti.id = %s AND novosti.status = 1
+    WHERE novosti.id = %s 
     """,
         (vest_id,),
     )
@@ -846,7 +846,7 @@ WHERE novinari_kategorije.novinar_id = %s;""",
     "/cms/odobri_zahtev/<int:id_zahteva>/<string:tip_zahteva>", methods=["GET", "POST"]
 )
 def odobri_zahtev(id_zahteva, tip_zahteva):
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -954,7 +954,7 @@ def najnovije_vesti():
 
 @app.route("/dodeli_kategorije/novinar:<int:novinar_id>", methods=["GET", "POST"])
 def dodeli_kategorije(novinar_id):
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -997,6 +997,33 @@ def dodeli_kategorije(novinar_id):
         kategorije=kategorije,
         kategorije_dodeljene_novinaru=kategorije_ids,
     )
+
+@app.route('/vrati_u_draft/vest:<int:novost_id>')
+def vrati_u_draft(novost_id):
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
+        return redirect(url_for("home"))
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM novosti WHERE id = %s", (novost_id,))
+        novost = cursor.fetchone()
+
+        if novost:
+            cursor.execute(
+                "UPDATE novosti SET status = 0 WHERE id = %s",
+                (novost_id,),
+            )
+            mysql.connection.commit()
+
+            return redirect(url_for('pregled_novosti'))
+        else:
+            return redirect(url_for('pregled_novosti'))
+
+    except Exception as e:
+        print(f"Greska prilikom azuriranja statusa novosti: {e}")
+        return redirect(url_for('pregled_novosti'))
+
+    finally:
+        cursor.close()
 
 
 if __name__ == "__main__":
