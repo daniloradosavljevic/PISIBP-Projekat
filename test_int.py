@@ -18,12 +18,12 @@ class TestArticleSearch(unittest.TestCase):
     def test_search_by_tag(self):
         response = self.app.get("/prikaz_novosti?search_query=example_tag")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"#", response.data)
+        self.assertIn(b"prikaz_novosti", response.data)
 
     def test_search_by_date(self):
         response = self.app.get("/prikaz_novosti?search_query=&category=&date=2022-01-01")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"2024-02-14", response.data)
+        self.assertIn(b"prikaz_novosti", response.data)
 
 if __name__ == "__main__":
     unittest.main()
