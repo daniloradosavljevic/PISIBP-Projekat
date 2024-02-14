@@ -42,9 +42,9 @@ def home():
     ulogovan = False
     if "loggedin" in session and session["loggedin"]:
         ulogovan = True
-        return render_template("index.html", ulogovan=ulogovan)
+        return redirect(url_for("najnovije_vesti"))
     else:
-        return redirect(url_for("prikaz_novosti"))
+        return redirect(url_for("najnovije_vesti"))
 
 
 @app.route("/cms/login", methods=["GET", "POST"])
