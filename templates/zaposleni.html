@@ -43,7 +43,9 @@
                 <div align="center">
                     <div class="header mb-3">
                         <h1 class="word">Lista Zaposlenih</h1>
-                        <a href="{{url_for('register')}}" class="btn btn-lg btn-dark m-4 zoom" role="button" aria-pressed="true">Dodaj zaposljenog</a>
+                        {% if session['uloga'] == 1 %}
+                        <a href="{{url_for('register')}}" class="btn btn-lg btn-dark m-4 zoom" role="button" aria-pressed="true">Dodaj zaposlenog</a>
+                        {% endif %}
                     </div>
                     
                     <table class="table table-bordered border-dark">

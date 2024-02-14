@@ -423,7 +423,7 @@ def vest(vest_id):
 
         return render_template("vest.html", vest=vest_data)
     else:
-        return redirect(url_for('home'))
+        return redirect(url_for("home"))
 
 
 @app.route("/komentarisi/<int:vest_id>", methods=["GET", "POST"])
@@ -513,7 +513,9 @@ def lajkovanje(vest_id, tip):
 
 
 @app.route(
-    "/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>", methods=["GET", "POST"])
+    "/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>",
+    methods=["GET", "POST"],
+)
 def lajkovanje_komentara(komentar_id, vest_id, tip):
     public_ip = ip.get()
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -871,6 +873,9 @@ def odobri_zahtev(id_zahteva, tip_zahteva):
 
 @app.route("/odbij_zahtev/<int:id_zahteva>", methods=["GET", "POST"])
 def odbij_zahtev(id_zahteva):
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
+        return redirect(url_for("home"))
+
     cursor = mysql.connection.cursor()
 
     try:
@@ -998,7 +1003,8 @@ def dodeli_kategorije(novinar_id):
         kategorije_dodeljene_novinaru=kategorije_ids,
     )
 
-@app.route('/vrati_u_draft/vest:<int:novost_id>')
+
+@app.route("/vrati_u_draft/vest:<int:novost_id>")
 def vrati_u_draft(novost_id):
     if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
@@ -1014,13 +1020,13 @@ def vrati_u_draft(novost_id):
             )
             mysql.connection.commit()
 
-            return redirect(url_for('pregled_novosti'))
+            return redirect(url_for("pregled_novosti"))
         else:
-            return redirect(url_for('pregled_novosti'))
+            return redirect(url_for("pregled_novosti"))
 
     except Exception as e:
         print(f"Greska prilikom azuriranja statusa novosti: {e}")
-        return redirect(url_for('pregled_novosti'))
+        return redirect(url_for("pregled_novosti"))
 
     finally:
         cursor.close()
