@@ -41,7 +41,9 @@
                     {% endif %}
                     </li>
                     <li class="nav-item px-2">
+                        {% if session.loggedin %}
                         <a href="{{ url_for('cms') }}" class="nav-link text-light">CMS</a>
+                        {% endif %}
                     </li>
                 </ul>
             </div>

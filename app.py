@@ -1,9 +1,6 @@
 import os
 from flask import (
     Flask,
-    abort,
-    flash,
-    jsonify,
     render_template,
     request,
     redirect,
@@ -1033,4 +1030,4 @@ def vrati_u_draft(novost_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)

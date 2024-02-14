@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Feb 14, 2024 at 10:56 AM
+-- Generation Time: Feb 14, 2024 at 07:05 PM
 -- Server version: 8.2.0
 -- PHP Version: 8.2.13
 
@@ -191,14 +191,17 @@ CREATE TABLE IF NOT EXISTS `novinari_kategorije` (
   `novinar_id` int NOT NULL,
   `kategorija_id` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `novinari_kategorije`
 --
 
 INSERT INTO `novinari_kategorije` (`id`, `novinar_id`, `kategorija_id`) VALUES
-(8, 5, 1);
+(8, 5, 1),
+(9, 6, 5),
+(10, 6, 5),
+(11, 3, 5);
 
 -- --------------------------------------------------------
 
@@ -218,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `novosti` (
   `tagovi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `author_id` (`id_autora`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `novosti`
@@ -230,11 +233,12 @@ INSERT INTO `novosti` (`id`, `naziv`, `kategorija`, `sadrzaj`, `id_autora`, `sta
 (3, 'test', '1', '<p><img src=\"../static/uploads/test.jpeg\" alt=\"\" width=\"348\" height=\"261\"></p>\n<h2>What is Lorem Ipsum?</h2>\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>', 2, 0, '0000-00-00 00:00:00', ''),
 (4, 'test', '1', '<p><img src=\"../static/uploads/test.jpeg\" alt=\"\" width=\"340\" height=\"255\"></p>\r\n<h2>What is Lorem Ipsum?</h2>\r\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>', 2, 1, '0000-00-00 00:00:00', ''),
 (5, 'test 2', '1', '<h2>What is Lorem Ipsum?</h2>\n<p><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<img src=\"../static/uploads/test.jpeg\" alt=\"\" width=\"340\" height=\"255\"></p>', 2, 0, '0000-00-00 00:00:00', ''),
-(6, 'Vest fudbal', '1', '<p><img src=\"../static/uploads/magic2.jpg\" alt=\"\" width=\"716\" height=\"477\"></p>\r\n<p>Uzbudljive vesti iz sveta sporta stižu nam danas, dok je fudbalski svet potresao neočekivan transfer jednog od najtalentovanijih mladih igrača. Prema na&scaron;im izvorima, virtuozni vezista, Maksimilian \"Magični\" Petrović, prelazi iz neprikosnovenog tima \"Vatrene Stene\" u evropskog giganta \"Neumoljivi Torpedi\".</p>\r\n<p>Transfer je postao tema broj jedan među ljubiteljima fudbala &scaron;irom sveta, jer se očekuje da će Petrovićev izuzetan talenat doneti novu dimenziju igri \"Neumoljivih Torpeda\". Maksimilian je pro&scaron;le sezone briljirao svojim driblinzima, preciznim pasovima i neodoljivim &scaron;utevima, stvarajući pravo malo čudo na terenu.</p>\r\n<p>Izvor blizak igraču otkriva nam da je sam Petrović bio iznenađen brzinom transfera, ali da je uzbuđen zbog novih izazova i prilike da igra za jedan od najprestižnijih klubova u Evropi. \"Neumoljivi Torpedi\" su već poznati po osvajanju mnogobrojnih trofeja, a sada će imati priliku da u svom sastavu imaju mladog čarobnjaka koji obećava da će zasijati na najvećim evropskim terenima.</p>\r\n<p>&nbsp;</p>', 1, 1, '0000-00-00 00:00:00', ''),
+(6, 'Vest fudbal', '1', '<p><img src=\"../static/uploads/magic2.jpg\" alt=\"\" width=\"716\" height=\"477\"></p>\r\n<p>Uzbudljive vesti iz sveta sporta stižu nam danas, dok je fudbalski svet potresao neočekivan transfer jednog od najtalentovanijih mladih igrača. Prema na&scaron;im izvorima, virtuozni vezista, Maksimilian \"Magični\" Petrović, prelazi iz neprikosnovenog tima \"Vatrene Stene\" u evropskog giganta \"Neumoljivi Torpedi\".</p>\r\n<p>Transfer je postao tema broj jedan među ljubiteljima fudbala &scaron;irom sveta, jer se očekuje da će Petrovićev izuzetan talenat doneti novu dimenziju igri \"Neumoljivih Torpeda\". Maksimilian je pro&scaron;le sezone briljirao svojim driblinzima, preciznim pasovima i neodoljivim &scaron;utevima, stvarajući pravo malo čudo na terenu.</p>\r\n<p>Izvor blizak igraču otkriva nam da je sam Petrović bio iznenađen brzinom transfera, ali da je uzbuđen zbog novih izazova i prilike da igra za jedan od najprestižnijih klubova u Evropi. \"Neumoljivi Torpedi\" su već poznati po osvajanju mnogobrojnih trofeja, a sada će imati priliku da u svom sastavu imaju mladog čarobnjaka koji obećava da će zasijati na najvećim evropskim terenima.</p>\r\n<p>&nbsp;</p>', 1, 0, '0000-00-00 00:00:00', ''),
 (7, 'Lorem ipsum', '5', '<h1>Lorem Ipsum</h1>\r\n<h4>\"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...\"</h4>\r\n<h5>\"Не постоји нико ко воли бол, ко га тражи и жели, једноставно зато што је бол...\"</h5>\r\n<p>&nbsp;</p>', 2, 0, '2024-02-06 22:02:57', '<p>lorem, ipsum, demo, tekst</p>'),
 (8, 'test', '1', '<p>test</p>', 2, 0, '2024-02-06 22:42:07', 'test, test, test2'),
 (9, 'test', '1', '<p>test</p>', 2, 0, '2024-02-06 22:42:20', 'test, test, test'),
-(10, 'reste1', '1', '<p>test</p>', 2, 0, '2024-02-06 22:43:15', '2024-02-06 22:43:15');
+(10, 'reste1', '1', '<p>test</p>', 2, 0, '2024-02-06 22:43:15', '2024-02-06 22:43:15'),
+(12, 'aasdasda', '5', '<p>sadadasd</p>', 6, 0, '2024-02-14 16:49:11', 'dasda');
 
 -- --------------------------------------------------------
 
@@ -252,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `zahtevi` (
   PRIMARY KEY (`id`),
   KEY `id_autora` (`id_autora`),
   KEY `id_novosti` (`id_novosti`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `zahtevi`
@@ -261,7 +265,8 @@ CREATE TABLE IF NOT EXISTS `zahtevi` (
 INSERT INTO `zahtevi` (`id`, `id_autora`, `id_novosti`, `datum`, `zahtev`) VALUES
 (1, 2, 10, '2024-02-06 23:42:34', 'Korisnik test je zatražio odobrenje za sledeću vest: reste'),
 (2, 2, 9, '2024-02-06 23:46:35', 'Korisnik test je zatražio izmenu za sledeću vest: test'),
-(3, 1, 1, '2024-02-08 12:17:25', 'Odobrenje');
+(3, 1, 1, '2024-02-08 12:17:25', 'Odobrenje'),
+(12, 3, 14, '2024-02-14 17:20:05', 'Odobrenje');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
