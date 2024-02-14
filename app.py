@@ -459,10 +459,16 @@ def inject_functions():
     )
 
 
-@app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["POST"])
+@app.route("/lajkovanje/<int:vest_id>/<int:tip>", methods=["GET","POST"])
 def lajkovanje(vest_id, tip):
     public_ip = ip.get()
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cursor.execute('SELECT * FROM novosti WHERE id = %s' % vest_id)
+    postoji_vest = cursor.fetchone()
+    
+    if not postoji_vest:
+        return redirect(url_for('home'))
 
     cursor.execute(
         "SELECT * FROM lajkovi_vesti WHERE id_vesti = %s AND ip_adresa = %s",
