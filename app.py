@@ -602,16 +602,52 @@ def obrisi_novost(novost_id):
     cursor.execute("SELECT id_autora FROM novosti WHERE id = %s", (novost_id,))
     result = cursor.fetchone()
 
+    cursor.execute("SELECT status FROM novosti WHERE id = %s", (novost_id,))
+    status_result = cursor.fetchone()
+
     if not result:
         return redirect(url_for("home"))
 
     id_autora = result[0]
 
-    if session["id"] != id_autora:
-        return redirect(url_for("home"))
+    if session["uloga"] == 1:
 
-    cursor.execute("DELETE FROM novosti WHERE id = %s", (novost_id,))
-    mysql.connection.commit()
+        cursor.execute("DELETE FROM novosti WHERE id = %s", (novost_id,))
+        mysql.connection.commit()
+
+        return redirect(url_for("pregled_novosti"))
+
+    elif session["uloga"] == 2:
+        cursor.execute(
+            "SELECT kategorija FROM novosti WHERE id = %s",
+            (novost_id,),
+        )
+        kategorija_vesti = cursor.fetchone()
+        cursor.execute(
+            "SELECT kategorija_id FROM novinari_kategorije WHERE novinar_id = %s",
+            (session["id"],),
+        )
+        id_list = [row[0] for row in cursor.fetchall()]
+        if int(kategorija_vesti[0]) in id_list:
+            cursor.execute(
+                "DELETE FROM novosti WHERE id = %s",
+                (novost_id,),
+            )
+            mysql.connection.commit()
+
+            return redirect(url_for("pregled_novosti"))
+        else:
+            return redirect(url_for("pregled_novosti"))
+
+    elif session["uloga"] == 3 and (
+        session["id"] == id_autora and status_result[0] == 0
+    ):
+        cursor.execute(
+            "DELETE FROM novosti WHERE id = %s",
+            (novost_id,),
+        )
+        mysql.connection.commit()
+        return redirect(url_for("home"))
 
     return redirect(url_for("pregled_novosti"))
 
@@ -649,8 +685,9 @@ def pregled_novosti():
     offset = (stranica - 1) * rezultati_po_stranici
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute(
-        """
+    if session["uloga"] == 3:
+        cursor.execute(
+            """
         SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija,
                novosti.sadrzaj, novosti.status, novosti.datum
         FROM novosti
@@ -659,8 +696,34 @@ def pregled_novosti():
         ORDER BY novosti.datum DESC
         LIMIT %s OFFSET %s
         """,
-        (session["id"], rezultati_po_stranici, offset),
-    )
+            (session["id"], rezultati_po_stranici, offset),
+        )
+    elif session["uloga"] == 2:
+        cursor.execute(
+            """
+        SELECT DISTINCT novosti.id, novosti.naziv, kategorije.naziv AS kategorija,
+               novosti.sadrzaj, novosti.status, novosti.datum
+        FROM novosti
+        INNER JOIN kategorije ON novosti.kategorija = kategorije.id
+        INNER JOIN novinari_kategorije ON novinari_kategorije.kategorija_id = kategorije.id
+        WHERE novinari_kategorije.novinar_id = %s
+        ORDER BY novosti.datum DESC
+        LIMIT %s OFFSET %s
+        """,
+            (session["id"], rezultati_po_stranici, offset),
+        )
+    else:
+        cursor.execute(
+            """
+        SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija,
+               novosti.sadrzaj, novosti.status, novosti.datum
+        FROM novosti
+        INNER JOIN kategorije ON novosti.kategorija = kategorije.id
+        ORDER BY novosti.datum DESC
+        LIMIT %s OFFSET %s
+        """,
+            (rezultati_po_stranici, offset),
+        )
     novosti = cursor.fetchall()
 
     return render_template(
@@ -753,11 +816,22 @@ def zatrazi_izmenu(vest_id):
 
 @app.route("/cms/prikaz_zahteva", methods=["GET", "POST"])
 def prikaz_zahteva():
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM zahtevi")
+    if session["uloga"] == 1:
+        cursor.execute("SELECT * FROM zahtevi")
+    else:
+        cursor.execute(
+            """SELECT zahtevi.*
+FROM zahtevi
+INNER JOIN novosti ON zahtevi.id_novosti = novosti.id
+INNER JOIN novinari_kategorije ON novosti.kategorija = novinari_kategorije.kategorija_id
+WHERE novinari_kategorije.novinar_id = %s;""",
+            (session["id"],),
+        )
+
     zahtevi = cursor.fetchall()
 
     return render_template("prikaz_zahteva.html", zahtevi=zahtevi)

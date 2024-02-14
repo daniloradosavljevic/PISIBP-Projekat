@@ -17,7 +17,7 @@
                             <i class="fa-solid fa-file-circle-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Kreiraj novosti</span></a>
                     </li>
                     <li class="liAnimacija zoom">
-                        <a href="{{ url_for('prikaz_novosti') }}"  class="nav-link px-0 align-middle ">
+                        <a href="{{ url_for('pregled_novosti') }}"  class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz novosti</span></a>
                     </li>
                     <li class="liAnimacija zoom">
@@ -46,9 +46,7 @@
 
 <h2 class="text-center">Hello, {{ session.username }}!!</h2>
 
-<!-- JavaScript for displaying alert popup -->
 <script>
-    // Function to display alert popup
     function showAlert(message) {
         alert(message);
     }
@@ -57,28 +55,29 @@
 <p class="text-center">Evo su vase vesti</p>
 
 {% for vest in novosti %}
-<div class="bg-white zoom">
+<div class="bg-white">
     <h2>{{ vest['naziv'] }}</h2>
     <p><strong>Kategorija:</strong> {{ vest['kategorija'] }}</p>
     <p><strong>Datum:</strong> {{ vest['datum'] }}</p>
     <p><strong>Status:</strong>
         {% if vest['status'] == 0 %}
             Neodobreno
-            <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id']) }}" onclick="showAlert('Zahtev za odobrenje je poslat.')" class="btn btn-dark text-center zoom">Zatraži odobrenje</a>
-        {% else %}
-            Odobreno
-            
-            <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Izmena') }}" onclick="showAlert('Zahtev za izmenu je poslat.')" class="btn btn-dark text-center zoom">Zatraži izmenu</a>
-            <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Brisanje') }}" onclick="showAlert('Zahtev za brisanje je poslat.')" class="btn btn-dark text-center zoom">Zatraži brisanje</a>
-        {% endif %}
+        {% if session['uloga'] == 3 %}
+        <a href="{{ url_for('zatrazi_odobrenje', vest_id=vest['id']) }}" onclick="showAlert('Zahtev za odobrenje je poslat.')" class="btn btn-dark text-center zoom">Zatraži odobrenje</a>
+        {% endif %}{% else %}
+        Odobreno
+        {% if session['uloga'] == 3 %}
+        <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Izmena') }}" onclick="showAlert('Zahtev za izmenu je poslat.')" class="btn btn-dark text-center zoom">Zatraži izmenu</a>
+        <a href="{{ url_for('zatrazi_izmenu', vest_id=vest['id'], zahtev='Brisanje') }}" onclick="showAlert('Zahtev za brisanje je poslat.')" class="btn btn-dark text-center zoom">Zatraži brisanje</a>
+        {% endif %}{% endif %}
     </p>
     <div class="text-center">
         <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="btn btn-dark text-center zoom">Pročitaj više</a>
     {% if vest['status'] == 0 %}
         <a href="{{ url_for('izmeni_novost', novost_id=vest['id']) }}" class="btn btn-dark text-center zoom">Izmeni vest</a>
-    {% endif %}
+    
     <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')" class="btn btn-dark text-center zoom">Obrisi vest</a>
-    <hr>
+    {% endif %}<hr>
     </div>
     
 </div>
@@ -86,10 +85,10 @@
 
 <div>
     {% if stranica > 1 %}
-    <a href="{{ url_for('prikaz_novosti', stranica=stranica-1) }}" class="btn  mb-3"><i class="fa-solid fa-arrow-left fa-bounce"></i></a>
+    <a href="{{ url_for('pregled_novosti', stranica=stranica-1) }}" class="btn  mb-3"><i class="fa-solid fa-arrow-left fa-bounce"></i></a>
     {% endif %}
     {% if novosti|length >= rezultati_po_stranici %}
-    <a href="{{ url_for('prikaz_novosti', stranica=stranica+1) }}" class="btn  mb-3"><i class="fa-solid fa-arrow-right fa-bounce"></i></a>
+    <a href="{{ url_for('pregled_novosti', stranica=stranica+1) }}" class="btn  mb-3"><i class="fa-solid fa-arrow-right fa-bounce"></i></a>
     {% endif %}
 </div>
         </div>
