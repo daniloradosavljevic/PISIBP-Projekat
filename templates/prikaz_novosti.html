@@ -1,64 +1,47 @@
 {% extends 'base.html' %} {% block body %}
 <div class="container">
     <div class="row mt-5">
-      <div class="col-lg-3 d-none d-lg-block">
-        <div class="card bg-dark text-white text-center">
-          <div class="card-body">
-            <h2 class="">Kategorije</h2>
-            <ul class="navbar-nav" data-toggle="animation" data-animation="zoom-in" data-animation-start="onLoad">
-                <li class="nav-item py-2 ">
-                    <a href="" class="nav-link text-light zoom" >Kategorija1</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light zoom">Kategorija2</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light zoom">Kategorija3</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light zoom">Kategorija4</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light zoom">Kategorija5</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light zoom">Kategorija6</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light zoom">Kategorija7</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light zoom">Kategorija8</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija9</a>
-                </li>
-                <li class="nav-item py-2">
-                    <a href="" class="nav-link text-light">Kategorija10</a>
-                </li>
-            </ul>
-          </div>
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="card bg-dark text-white text-center">
+                <div class="card-body">
+                    <h2 class="">Kategorije</h2>
+                    
+                    <form action="{{ url_for('prikaz_novosti') }}" method="GET">
+                    <ul class="navbar-nav" data-toggle="animation" data-animation="zoom-in" data-animation-start="onLoad">
+                    {% for category in categories %}
+                        <li class="nav-item py-2 " value="{{ category['id'] }}">
+                            <a href="{{ url_for('prikaz_novosti') }}" class="nav-link text-light zoom">{{ category['naziv'] }}</a>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </form>
+                </div>
+            </div>
         </div>
-      </div>
-      
-      <div class="col-lg-9 justify-content-center ">
-        <form class="d-flex input-group w-auto ">
-          <input type="text" class="form-control rounded ms-4 " placeholder="Pretraga" aria-label="Search" aria-describedby="search-addon" name="search_query" value="{{ search_query }}" />
-          <span class="input-group-text border-0 me-5" id="search-addon">
-            <i class="fas fa-search"></i>
-          </span>
-        </form><br>
-        <main role="main" class="container-fluid d-none d-xl-block ">
-          {% for vest in novosti %}
-          <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="card-link" style="text-decoration: none;">
-              <div class="card mb-4 zoom">
-                  <div class="row no-gutters">
-      
-                      <div class="col-md-7">
-                          <div class="card-body">
-                              <div class="card-text text-dark">
-                                  {{ vest['sadrzaj'] | replace('width="', '') | replace('height="', '') | replace('<img ', '<img style="width: 880px; height: 210px;" ') | safe}}
-                              </div>
+
+        <div class="col-lg-9 justify-content-center ">
+            <form action="{{ url_for('prikaz_novosti') }}" method="GET">
+                <input type="text" name="search_query" placeholder="Pretraga" value="{{ search_query }}">
+                <select name="category">
+                    <option value="" >Izaberi kategoriju</option>
+                    {% for category in categories %}
+                        <option value="{{ category['id'] }}" {% if category['id'] == category %} selected {% endif %}>{{ category['naziv'] }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="fa-solid fa-magnifying-glass"></button> {% if search_query or category %}
+                <a href="{{ url_for('prikaz_novosti') }}" class="btn btn-secondary">Reset Search</a> {% endif %}
+            </form><br>
+            <main role="main" class="container-fluid d-none d-xl-block ">
+                {% for vest in novosti %}
+                <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="card-link" style="text-decoration: none;">
+                    <div class="card mb-4 zoom">
+                        <div class="row no-gutters">
+
+                            <div class="col-md-7">
+                                <div class="card-body">
+                                    <div class="card-text text-dark">
+                                        {{ vest['sadrzaj'] | replace('width="', '') | replace('height="', '') | replace('<img ', '<img style="width: 880px; height: 210px;" ') | safe}}
+                                    </div>
                               <h5 class="card-title text-dark pt-2" style="text-decoration: none;">{{ vest['naziv'] }}</h5>
                               <p class="text-dark"><strong>Author:</strong> {{ vest['author_username'] }}</p>
                               <p class="text-dark"><strong>Datum:</strong> {{ vest['datum'] }}</p>
@@ -71,18 +54,17 @@
       </main>
       <main role="main" class="container d-block d-xl-none">
         {% for vest in novosti %}
-        <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="card-link" style="text-decoration: none;">
             <div class="card mb-4">
                 <div class="row no-gutters">
     
                     <div class="col-md-7">
                         <div class="card-body">
                             <div class="card-text text-dark">
-                                {{ vest['sadrzaj'] | replace('width="', '') | replace('height="', '') | replace('<img ', '<img style="max-width: 100%; height: auto;" ') | safe}}
+                                {{ vest['sadrzaj '] | replace('width="', '') | replace('height=" ', ' ') | replace('<img ', '<img style="max-width: 100%; height: auto;" ') | safe}}
                             </div>
-                            <h5 class="card-title text-dark pt-2" style="text-decoration: none;">{{ vest['naziv'] }}</h5>
-                            <p class="text-dark"><strong>Author:</strong> {{ vest['author_username'] }}</p>
-                            <p class="text-dark"><strong>Datum:</strong> {{ vest['datum'] }}</p>
+                            <h5 class="card-title text-dark pt-2" style="text-decoration: none;">{{ vest['naziv '] }}</h5>
+                            <p class="text-dark"><strong>Author:</strong> {{ vest['author_username '] }}</p>
+                            <p class="text-dark"><strong>Datum:</strong> {{ vest['datum '] }}</p>
                         </div>
                     </div>
                 </div>

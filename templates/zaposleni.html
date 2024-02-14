@@ -45,7 +45,7 @@
                 <div align="center">
                     <div class="header mb-3">
                         <h1 class="word">Lista Zaposlenih</h1>
-                        <a href="{{url_for('register')}}" class="btn btn-lg btn-dark m-4" role="button" aria-pressed="true">Dodaj zaposljenog</a>
+                        <a href="{{url_for('register')}}" class="btn btn-lg btn-dark m-4 zoom" role="button" aria-pressed="true">Dodaj zaposljenog</a>
                     </div>
                     
                     <table class="table table-bordered border-dark">
@@ -70,10 +70,10 @@
                                 <td>{{ zaposlen.email }}</td>
                                 <td>{{ uloge[zaposlen.uloga] }}</td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('izmeni_zaposlenog',zaposleni_id=zaposlen.id) }}" class="btn btn-primary bg-dark">Izmeni</a>
+                                    <a href="{{ url_for('izmeni_zaposlenog',zaposleni_id=zaposlen.id) }}" class="btn btn-primary bg-dark zoom">Izmeni</a>
                                     {% if zaposlen.uloga != 1 %}
-                                    <a href="{{ url_for('ukloni_zaposlenog',zaposleni_id=zaposlen.id) }}" class="btn btn-primary bg-dark" onclick="return confirm('Da li ste sigurni da želite da uklonite ovog zaposlenog?')">Ukloni</a>
-                                    <a href="{{ url_for('dodeli_kategorije',novinar_id=zaposlen.id) }}"class="btn btn-primary bg-dark">Dodeli kategorije</a>
+                                    <a href="{{ url_for('ukloni_zaposlenog',zaposleni_id=zaposlen.id) }}" class="btn btn-primary bg-dark zoom" onclick="return confirm('Da li ste sigurni da želite da uklonite ovog zaposlenog?')">Ukloni</a>
+                                    <a href="{{ url_for('dodeli_kategorije',novinar_id=zaposlen.id) }}"class="btn btn-primary bg-dark zoom">Dodeli kategorije</a>
                                     {% endif %}
                                 </td>
                             </tr>
