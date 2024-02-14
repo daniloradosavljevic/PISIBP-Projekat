@@ -1,21 +1,68 @@
-{% extends 'base.html' %}
 
-{% block body %}
-  <h1>Dodela kategorija za novinara: {{ novinar['username'] }}</h1>
-
-  <form method="POST" action="">
-    {% for kategorija in kategorije %}
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="kategorije" value="{{ kategorija[0] }}"
-          {% if kategorija[0] in kategorije_dodeljene_novinaru %} checked {% endif %}>
-        <label class="form-check-label" for="{{ kategorija[0] }}">
-          <p>{{ kategorija[1] }}</p>
-        </label>
-      </div>
-    {% endfor %}
-
-    <button type="submit" class="btn btn-primary">Sačuvaj promene</button>
-    <a href="{{ url_for('zaposleni') }}">Nazad na prikaz zaposlenih</a>
-
-  </form>
+  {% extends 'base.html' %} {% block body %}
+{% if session['uloga'] == 1 %}
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                <a href="{{ url_for('cms') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <i class="fa-solid fa-person-digging text-white"></i><span class="fs-5 d-none d-sm-inline px-3">Meni</span>
+                </a>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start ulAnimacija" id="menu">
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('zaposleni') }}" class="nav-link px-0 align-middle ulhover">
+                            <i class="fa-solid fa-people-roof text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lista zaposlenih</span> </a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('kreiraj_novosti') }}" class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-file-circle-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Kreiraj novosti</span></a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('pregled_novosti') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz novosti</span></a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('prikaz_kategorija') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-list text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz kategorija</span></a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('prikaz_zahteva') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-bell text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz zahteva</span></a>
+                    </li>
+                </ul>
+                <hr>
+                <div class="dropdown pb-4">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1">Korisnik</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                        <li><a class="dropdown-item" href="{{ url_for('najnovije_vesti') }}">Nazad na sajt</a></li>
+                        <li><a href="{{ url_for('logout') }}" class="dropdown-item text-light btn">Logout</a> </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col py-3">
+          <div align="center">
+          <h1 class="text-center">Dodela kategorija za novinara: {{ novinar['username'] }}</h1>
+          <form method="POST" action="">
+            {% for kategorija in kategorije %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="kategorije" value="{{ kategorija[0] }}"
+                  {% if kategorija[0] in kategorije_dodeljene_novinaru %} checked {% endif %}>
+                <label class="form-check-label" for="{{ kategorija[0] }}">
+                  <p class="text-center">{{ kategorija[1] }}</p>
+                </label>
+              </div>
+            {% endfor %}
+        
+            <button type="submit" class="btn btn-black">Sačuvaj promene</button>
+            <a href="{{ url_for('zaposleni') }}" class="btn btn-black mt-1">Nazad na prikaz zaposlenih</a>
+        
+          </form>
+          </div>
+        </div>
+    </div>
+</div>
+{% endif %} {% endblock %}
 {% endblock %}

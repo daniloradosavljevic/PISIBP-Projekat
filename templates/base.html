@@ -18,17 +18,17 @@
 
 <body class="d-flex flex-column min-vh-100" style="background-color: #f5f5dc;">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-md navbar-light bg-dark">
-        <div class="container-sm">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark ">
+        <div class="container-xxl">
             <a href="" class="navbar-brand">
-                <img src="" alt="" width="130" height="50">
+              <img src="" alt="" width="130" height="50">
             </a>
-            <button class="navbar-toggler" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse justify-content-end align-center" id="main-nav">
                 <ul class="navbar-nav">
-                    <li class="nav-item px-2 ">
+                    <li class="nav-item ">
                         <a href="{{ url_for('najnovije_vesti') }}" class="nav-link text-light" >Pocetna</a>
                     </li>
                     <li class="nav-item px-2">
@@ -50,7 +50,7 @@
     <footer class="text-center mt-auto bg-dark">
         <div class="container pt-4">
           <section class="mb-4">
-            <a data-mdb-ripple-init class="btn btn-link btn-floating btn-lg text-body m-1 " href="https://www.facebook.com" role="button" data-mdb-ripple-color="#123e72"><i class="fab fa-facebook-f" style="color: #ffff;"></i></a>
+            <a data-mdb-ripple-init class="btn btn-link btn-floating btn-lg text-body m-1" href="https://www.facebook.com" role="button" data-mdb-ripple-color="#123e72"><i class="fab fa-facebook-f" style="color: #ffff;"></i></a>
             <a data-mdb-ripple-init class="btn btn-link btn-floating btn-lg text-body m-1" href="https://twitter.com/home" role="button" data-mdb-ripple-color="#123e72"><i class="fab fa-twitter"style="color: #ffff;"></i></a>
             <a data-mdb-ripple-init class="btn btn-link btn-floating btn-lg text-body m-1" href="https://www.google.co.uk" role="button" data-mdb-ripple-color="#123e72"><i class="fab fa-google"style="color: #ffff;"></i></a>
             <a data-mdb-ripple-init class="btn btn-link btn-floating btn-lg text-body m-1" href="https://www.instagram.com"role="button" data-mdb-ripple-color="#123e72"><i class="fab fa-instagram"style="color: #ffff;"></i></a>

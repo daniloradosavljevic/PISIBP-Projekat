@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block body %}
 
 
-<div class="bg-image">
+<div class="bg-image ">
     <div class="container-fluid fw-bold">
             <form action="{{ url_for('register') }}" method="post" class="mx-auto form_a">
                 <div class="header-text text-center">
@@ -35,7 +35,7 @@
                 </div>
             
                 <input type="submit" class="btn btn-lg btn_1 w-100 fs-6" value="Dodaj korisnika">
-                <a class="bottom" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
+                <a class="bottom btn btn-lg btn_1 w-100 fs-6 mt-1" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
 
                 {% endif %}
             </form>

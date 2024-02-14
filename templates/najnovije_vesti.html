@@ -6,33 +6,38 @@
 </br>
 <div class="container">
   <div class="row">
-    <h1 class="text-center p-3 mb-5 bg-dark rounded-pill text-white">Top Vesti</h1>
-    <div class="col-lg-8">
+    <h1 class="text-center p-3 mb-5 bg-dark text-white tracking-in-expand">Top Vesti</h1>
+    {% if top_likes %}
+    <div class="col-lg-8 col-md-10 mx-auto">
       <div class="d-flex justify-content-center">
-        <div class="bg-image rounded" style="background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp'); height: 557px; width: 600px;">
-          <div class="mask" style="background-color: rgba(0, 0, 0, 0.6);">
-            <div class="d-flex">
-              <h1 class="text-light">Udarna vest</h1>
+        <div class="bg-dark zoom">
+          <a href="{{ url_for('vest',vest_id=sport_news['id']) }}" class="text-white bg-dark" style="text-decoration: none;">
+            {{ top_likes[0]['sadrzaj'] | replace('width="', '') | replace('height="', '') | replace('<img ', '<img class="img-fluid" ') | safe}}
+            <div class="mask ms-3">
+              <div class="d-flex">
+                <h1>{{ top_likes[0]['naziv'] }}</h1>
+              </a>
+              </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
+  {% endif %}
     <div class="col-lg-4 d-none d-lg-block justify-content-center">
-      <div class="card bg-dark text-white">
-        <div class="card-body">
-          <h2>Top 4 najnovije vesti sa najviše lajkova:</h2>
-          {% for vest in top_likes %}
+      <div class="card bg-dark text-white heartbeat">
+        <div class="card-body ">
+          <h2 class="text-center ">Top 4 najnovije vesti sa najviše lajkova:</h2>
+          {% for vest in top_likes[1:] %}
+          <a href="{{ url_for('vest',vest_id=vest['id']) }}" class="text-white" style="text-decoration: none;">
                       <div class="d-flex border-bottom-blue pt-3 pb-4 align-items-center justify-content-between">
-                        <div class=" pr-3 flex-grow-1">
+                        <div class=" pe-3 flex-grow-1">
                           <h5>{{ vest['naziv'] }}</h5>
-                          
                           <div class="fs-12">
-                              <p align="right"><a href="#link" class="btn text-light" role="button">Vidi jos</a></p>
                             <hr>
                           </div>
                         </div>
                       </div>
+                    </a>
                       {% endfor %}
                     </div>
                   </div>
@@ -41,7 +46,7 @@
                 </div>
                 <div class="container">
                   <div class="p-5 text-center bg-body-tertiary">
-                    <h1 class="py-3 display-4 border rounded-pill text-white bg-dark">Najnovije vesti</h1>
+                    <h1 class="py-3 display-4 border  text-white bg-dark">Najnovije vesti</h1>
                   </div>
                 </div>
 
@@ -50,38 +55,40 @@
   <section> 
     <div class="row gx-lg-5 py-5 mb-3 bg-dark">
       <!-- kolona1 -->
-      <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
+      <div class="col-lg-4 col-md-12 mb-4 mb-lg-0 zoom">
         <div>
           {% if sport_news %}
+          <a href="{{ url_for('vest',vest_id=sport_news['id']) }}" class="text-white" style="text-decoration: none;">
           <div class="">
             <img src="https://img.freepik.com/free-photo/sports-tools_53876-138077.jpg" class="img-fluid" />
-            <a href="#!">
-              <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
-            </a>
+              <div class="mask text-light" style="background-color: rgba(251, 251, 251, 0.15);">{{ sport_news['datum'] }}</div>
           </div>
           <div class="row mb-3">
             <div class="col-6">
+              
               <a href="" class="text-success"  style="text-decoration: none;">
                 <i class="fa-solid fa-futbol"></i> Sport</a>
             </div>
             <div class="col-6 text-end">
-              <u  class="text-white" style="text-decoration: none;" > 15.07.2020</u>
+              <u  class="text-white" style="text-decoration: none;" > </u>
             </div>
           </div>
-          <a href="" class="text-white" style="text-decoration: none;">
-            <h4 class="text-center">{{ sport_news['naziv'] }}</h4>
+          <a href="{{ url_for('vest',vest_id=sport_news['id']) }}" class="text-white" style="text-decoration: none;">
+            <h4 class="text-center text-white">{{ sport_news['naziv'] }}</h4>
             {% else %}
             <p class="text-white text-center">Nema vesti u kategoriji Sport.</p>
           {% endif %}
+        </a>
           </a>
           <hr />
           <!-- druga kolona -->
         </div>
       </div>
       
-      <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+      <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 zoom">
         <div>
           {% if politika_news %}
+          <a href="" class="text-white" style="text-decoration: none;">
           <div class="">
             <img src="https://static.wixstatic.com/media/54959d_040702a7af37410eb49733cafbc0b2f7~mv2.jpg/v1/fill/w_1000,h_688,al_c,q_85,usm_0.66_1.00_0.01/54959d_040702a7af37410eb49733cafbc0b2f7~mv2.jpg" class="img-fluid"
               alt="" />
@@ -96,7 +103,7 @@
             </div>
 
             <div class="col-6 text-end">
-              <u  style="text-decoration: none;"> 15.07.2020</u>
+              <u  style="text-decoration: none;">DATUM</u>
             </div>
           </div>
           <a href="" class="text-white"  style="text-decoration: none;">
@@ -106,13 +113,15 @@
             <p class="text-center text-white">Nema vesti u kategoriji Politika.</p>
             {% endif %}
           </a>
+          </a>
           <hr/>
         </div>
       </div>
       <!-- kolona3 -->
-      <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+      <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 zoom">
         <div>
           {% if tehnologija_news %}
+          <a href="" class="text-white" style="text-decoration: none;">
           <div class="">
             <img src="https://www.it-akademija.com/cms/mestoZaUploadFajlove/razvoj-tehnologija.jpg" class="img-fluid"
               alt="" />
@@ -129,7 +138,7 @@
             </div>
 
             <div class="col-6 text-end">
-              <u  style="text-decoration: none;"> 15.07.2020</u>
+              <u  style="text-decoration: none;">DATUM</u>
             </div>
           </div>
           <a href="" class="text-white"  style="text-decoration: none;">
@@ -139,30 +148,10 @@
             <p class="text-center text-white">Nema vesti u kategoriji Tehnologija.</p>
           {% endif %}
           </a>
+        </a>
           <hr />
         </div>
       </div>
     </div>
   </section>
-            {% if ulogovan == True %}
-        </div>
-        </br>
-        </br>
-        </br>
-        <h1 class="bottom">
-            Zdravo {{session.username}}!!</br>
-            </br> Dobrodosao
-        </h1>
-
-        </br>
-        <a href="{{ url_for('cms') }}" class="btn">CMS</a>
-        </br>
-        <a href="{{ url_for('prikaz_novosti') }}">Prikaz novosti</a>
-        </br>
-        <a href="{{ url_for('pregled_novosti') }}">Pregled novosti</a>
-        <!-- Add link to new page -->
-        </br>
-        <a href="{{ url_for('logout') }}" class="btn">Logout</a> {% endif %}
-    </div>
-</div>
 {% endblock %}
