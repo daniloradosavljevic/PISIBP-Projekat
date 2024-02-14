@@ -8,10 +8,12 @@
                     <i class="fa-solid fa-person-digging text-white"></i><span class="fs-5 d-none d-sm-inline px-3">Meni</span>
                 </a>
                 <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start ulAnimacija" id="menu">
+                    {% if session['uloga'] != 3 %}
                     <li class="liAnimacija zoom">
                         <a href="{{ url_for('zaposleni') }}" class="nav-link px-0 align-middle">
                             <i class="fa-solid fa-people-roof text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lista zaposlenih</span> </a>
                     </li>
+                    {% endif %}
                     <li class="liAnimacija zoom">
                         <a href="{{ url_for('kreiraj_novosti') }}" class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-file-circle-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Kreiraj novosti</span></a>
@@ -20,25 +22,21 @@
                         <a href="{{ url_for('pregled_novosti') }}"  class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz novosti</span></a>
                     </li>
+                    {% if session['uloga'] == 1 %}
                     <li class="liAnimacija zoom">
                         <a href="{{ url_for('prikaz_kategorija') }}"  class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-list text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz kategorija</span></a>
                     </li>
+                    {% endif %}
+                    {% if session['uloga'] != 3 %}
                     <li class="liAnimacija zoom">
                         <a href="{{ url_for('prikaz_zahteva') }}"  class="nav-link px-0 align-middle ">
                             <i class="fa-solid fa-bell text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz zahteva</span></a>
                     </li>
+                    {% endif %}
                 </ul>
                 <hr>
-                <div class="dropdown pb-4">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="d-none d-sm-inline mx-1">Admin</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                        <li><a class="dropdown-item" href="{{ url_for('najnovije_vesti') }}">Nazad na sajt</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Odjavi se</a></li>
-                    </ul>
-                </div>
+                
             </div>
         </div>
         <div class="col py-3">
@@ -73,9 +71,14 @@
     </p>
     <div class="text-center">
         <a href="{{ url_for('vest', vest_id=vest['id']) }}" class="btn btn-dark text-center zoom">Pročitaj više</a>
-    {% if vest['status'] == 0 %}
+        {% if session['id'] != 3 %}
+        <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')" class="btn btn-dark text-center zoom">Obrisi vest</a>
+        {% if vest['status'] == 1 %}
+        <a href="{{ url_for('vrati_u_draft', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da vratite ovu vest u draft stanje?')" class="btn btn-dark text-center zoom">Vrati u draft</a>
+        {% endif %}
+        {% endif %}
+    {% if vest['status'] == 0 and session['uloga'] == 3%}
         <a href="{{ url_for('izmeni_novost', novost_id=vest['id']) }}" class="btn btn-dark text-center zoom">Izmeni vest</a>
-    
     <a href="{{ url_for('obrisi_novost', novost_id=vest['id']) }}" onclick="return confirm('Da li ste sigurni da želite da uklonite ovu vest?')" class="btn btn-dark text-center zoom">Obrisi vest</a>
     {% endif %}<hr>
     </div>
