@@ -1,9 +1,6 @@
 import os
 from flask import (
     Flask,
-    abort,
-    flash,
-    jsonify,
     render_template,
     request,
     redirect,
@@ -143,7 +140,7 @@ def register():
 
 @app.route("/cms/zaposleni")
 def zaposleni():
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -332,7 +329,7 @@ def prikaz_novosti():
     FROM novosti
     INNER JOIN accounts ON novosti.id_autora = accounts.id
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
-    WHERE 1=1
+    WHERE 1=1 AND novosti.status = 1
     """
 
     params = []
@@ -393,7 +390,7 @@ def vest(vest_id):
     INNER JOIN accounts ON novosti.id_autora = accounts.id
     LEFT JOIN komentari ON novosti.id = komentari.vest_id
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
-    WHERE novosti.id = %s
+    WHERE novosti.id = %s 
     """,
         (vest_id,),
     )
@@ -422,8 +419,8 @@ def vest(vest_id):
         }
 
         return render_template("vest.html", vest=vest_data)
-
-    return url_for("home")
+    else:
+        return redirect(url_for("home"))
 
 
 @app.route("/komentarisi/<int:vest_id>", methods=["GET", "POST"])
@@ -513,11 +510,18 @@ def lajkovanje(vest_id, tip):
 
 
 @app.route(
-    "/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>", methods=["POST"]
+    "/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>",
+    methods=["GET", "POST"],
 )
 def lajkovanje_komentara(komentar_id, vest_id, tip):
     public_ip = ip.get()
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cursor.execute("SELECT * FROM komentari WHERE id = %s" % komentar_id)
+    postoji_komentar = cursor.fetchone()
+
+    if not postoji_komentar:
+        return redirect(url_for("home"))
 
     cursor.execute(
         "SELECT * FROM lajkovi_komentara WHERE id_komentara = %s AND ip_adresa = %s",
@@ -602,16 +606,52 @@ def obrisi_novost(novost_id):
     cursor.execute("SELECT id_autora FROM novosti WHERE id = %s", (novost_id,))
     result = cursor.fetchone()
 
+    cursor.execute("SELECT status FROM novosti WHERE id = %s", (novost_id,))
+    status_result = cursor.fetchone()
+
     if not result:
         return redirect(url_for("home"))
 
     id_autora = result[0]
 
-    if session["id"] != id_autora:
-        return redirect(url_for("home"))
+    if session["uloga"] == 1:
 
-    cursor.execute("DELETE FROM novosti WHERE id = %s", (novost_id,))
-    mysql.connection.commit()
+        cursor.execute("DELETE FROM novosti WHERE id = %s", (novost_id,))
+        mysql.connection.commit()
+
+        return redirect(url_for("pregled_novosti"))
+
+    elif session["uloga"] == 2:
+        cursor.execute(
+            "SELECT kategorija FROM novosti WHERE id = %s",
+            (novost_id,),
+        )
+        kategorija_vesti = cursor.fetchone()
+        cursor.execute(
+            "SELECT kategorija_id FROM novinari_kategorije WHERE novinar_id = %s",
+            (session["id"],),
+        )
+        id_list = [row[0] for row in cursor.fetchall()]
+        if int(kategorija_vesti[0]) in id_list:
+            cursor.execute(
+                "DELETE FROM novosti WHERE id = %s",
+                (novost_id,),
+            )
+            mysql.connection.commit()
+
+            return redirect(url_for("pregled_novosti"))
+        else:
+            return redirect(url_for("pregled_novosti"))
+
+    elif session["uloga"] == 3 and (
+        session["id"] == id_autora and status_result[0] == 0
+    ):
+        cursor.execute(
+            "DELETE FROM novosti WHERE id = %s",
+            (novost_id,),
+        )
+        mysql.connection.commit()
+        return redirect(url_for("home"))
 
     return redirect(url_for("pregled_novosti"))
 
@@ -649,8 +689,9 @@ def pregled_novosti():
     offset = (stranica - 1) * rezultati_po_stranici
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute(
-        """
+    if session["uloga"] == 3:
+        cursor.execute(
+            """
         SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija,
                novosti.sadrzaj, novosti.status, novosti.datum
         FROM novosti
@@ -659,8 +700,34 @@ def pregled_novosti():
         ORDER BY novosti.datum DESC
         LIMIT %s OFFSET %s
         """,
-        (session["id"], rezultati_po_stranici, offset),
-    )
+            (session["id"], rezultati_po_stranici, offset),
+        )
+    elif session["uloga"] == 2:
+        cursor.execute(
+            """
+        SELECT DISTINCT novosti.id, novosti.naziv, kategorije.naziv AS kategorija,
+               novosti.sadrzaj, novosti.status, novosti.datum
+        FROM novosti
+        INNER JOIN kategorije ON novosti.kategorija = kategorije.id
+        INNER JOIN novinari_kategorije ON novinari_kategorije.kategorija_id = kategorije.id
+        WHERE novinari_kategorije.novinar_id = %s
+        ORDER BY novosti.datum DESC
+        LIMIT %s OFFSET %s
+        """,
+            (session["id"], rezultati_po_stranici, offset),
+        )
+    else:
+        cursor.execute(
+            """
+        SELECT novosti.id, novosti.naziv, kategorije.naziv AS kategorija,
+               novosti.sadrzaj, novosti.status, novosti.datum
+        FROM novosti
+        INNER JOIN kategorije ON novosti.kategorija = kategorije.id
+        ORDER BY novosti.datum DESC
+        LIMIT %s OFFSET %s
+        """,
+            (rezultati_po_stranici, offset),
+        )
     novosti = cursor.fetchall()
 
     return render_template(
@@ -753,11 +820,22 @@ def zatrazi_izmenu(vest_id):
 
 @app.route("/cms/prikaz_zahteva", methods=["GET", "POST"])
 def prikaz_zahteva():
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM zahtevi")
+    if session["uloga"] == 1:
+        cursor.execute("SELECT * FROM zahtevi")
+    else:
+        cursor.execute(
+            """SELECT zahtevi.*
+FROM zahtevi
+INNER JOIN novosti ON zahtevi.id_novosti = novosti.id
+INNER JOIN novinari_kategorije ON novosti.kategorija = novinari_kategorije.kategorija_id
+WHERE novinari_kategorije.novinar_id = %s;""",
+            (session["id"],),
+        )
+
     zahtevi = cursor.fetchall()
 
     return render_template("prikaz_zahteva.html", zahtevi=zahtevi)
@@ -767,7 +845,7 @@ def prikaz_zahteva():
     "/cms/odobri_zahtev/<int:id_zahteva>/<string:tip_zahteva>", methods=["GET", "POST"]
 )
 def odobri_zahtev(id_zahteva, tip_zahteva):
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -792,6 +870,9 @@ def odobri_zahtev(id_zahteva, tip_zahteva):
 
 @app.route("/odbij_zahtev/<int:id_zahteva>", methods=["GET", "POST"])
 def odbij_zahtev(id_zahteva):
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
+        return redirect(url_for("home"))
+
     cursor = mysql.connection.cursor()
 
     try:
@@ -814,7 +895,7 @@ def najnovije_vesti():
             SELECT n.*, COUNT(l.id_vesti) AS lajkovi
             FROM novosti n
             LEFT JOIN lajkovi_vesti l ON n.id = l.id_vesti
-            GROUP BY n.id
+            GROUP BY n.id HAVING n.status = 1
             ORDER BY n.datum DESC, lajkovi DESC
             LIMIT 4
         """
@@ -827,7 +908,7 @@ def najnovije_vesti():
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
-            WHERE k.naziv = 'sport'
+            WHERE k.naziv = 'sport' AND n.status = 1
             ORDER BY n.datum DESC
             LIMIT 1
         """
@@ -839,7 +920,7 @@ def najnovije_vesti():
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
-            WHERE k.naziv = 'politika'
+            WHERE k.naziv = 'politika' AND n.status = 1
             ORDER BY n.datum DESC
             LIMIT 1
         """
@@ -851,7 +932,7 @@ def najnovije_vesti():
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
-            WHERE k.naziv = 'tehnologija'
+            WHERE k.naziv = 'tehnologija' AND n.status = 1
             ORDER BY n.datum DESC
             LIMIT 1
         """
@@ -875,7 +956,7 @@ def najnovije_vesti():
 
 @app.route("/dodeli_kategorije/novinar:<int:novinar_id>", methods=["GET", "POST"])
 def dodeli_kategorije(novinar_id):
-    if "loggedin" not in session or not session["loggedin"] or session["uloga"] != 1:
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
         return redirect(url_for("home"))
 
     cursor = mysql.connection.cursor()
@@ -920,5 +1001,33 @@ def dodeli_kategorije(novinar_id):
     )
 
 
+@app.route("/vrati_u_draft/vest:<int:novost_id>")
+def vrati_u_draft(novost_id):
+    if "loggedin" not in session or not session["loggedin"] or session["uloga"] == 3:
+        return redirect(url_for("home"))
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM novosti WHERE id = %s", (novost_id,))
+        novost = cursor.fetchone()
+
+        if novost:
+            cursor.execute(
+                "UPDATE novosti SET status = 0 WHERE id = %s",
+                (novost_id,),
+            )
+            mysql.connection.commit()
+
+            return redirect(url_for("pregled_novosti"))
+        else:
+            return redirect(url_for("pregled_novosti"))
+
+    except Exception as e:
+        print(f"Greska prilikom azuriranja statusa novosti: {e}")
+        return redirect(url_for("pregled_novosti"))
+
+    finally:
+        cursor.close()
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)

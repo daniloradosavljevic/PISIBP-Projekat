@@ -7,7 +7,7 @@
     <p class="lead text-center text-light">Category: {{ vest.kategorija }}</p>
     <p class="lead text-center text-light">Date: {{ vest.datum }}</p>
     <p class="lead text-center text-light">Tags: {% for tag in vest.tagovi.split(', ') %}
-        <a href="#">#{{ tag }}</a> {% endfor %}
+        <a >#{{ tag }}</a> {% endfor %}
     </p>
         </header>
     

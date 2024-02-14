@@ -1,0 +1,19 @@
+version: "3.8.10"
+
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_DATABASE: baze
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d/
+    ports:
+      - "3306:3306"
+
+  flask_app:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
