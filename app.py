@@ -332,7 +332,7 @@ def prikaz_novosti():
     FROM novosti
     INNER JOIN accounts ON novosti.id_autora = accounts.id
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
-    WHERE 1=1
+    WHERE 1=1 AND novosti.status = 1
     """
 
     params = []
@@ -393,7 +393,7 @@ def vest(vest_id):
     INNER JOIN accounts ON novosti.id_autora = accounts.id
     LEFT JOIN komentari ON novosti.id = komentari.vest_id
     INNER JOIN kategorije ON novosti.kategorija = kategorije.id
-    WHERE novosti.id = %s
+    WHERE novosti.id = %s AND novosti.status = 1
     """,
         (vest_id,),
     )
@@ -422,8 +422,8 @@ def vest(vest_id):
         }
 
         return render_template("vest.html", vest=vest_data)
-
-    return url_for("home")
+    else:
+        return redirect(url_for('home'))
 
 
 @app.route("/komentarisi/<int:vest_id>", methods=["GET", "POST"])
@@ -513,11 +513,16 @@ def lajkovanje(vest_id, tip):
 
 
 @app.route(
-    "/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>", methods=["POST"]
-)
+    "/lajkovanje_komentara/<int:komentar_id>/<int:vest_id>/<int:tip>", methods=["GET", "POST"])
 def lajkovanje_komentara(komentar_id, vest_id, tip):
     public_ip = ip.get()
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cursor.execute("SELECT * FROM komentari WHERE id = %s" % komentar_id)
+    postoji_komentar = cursor.fetchone()
+
+    if not postoji_komentar:
+        return redirect(url_for("home"))
 
     cursor.execute(
         "SELECT * FROM lajkovi_komentara WHERE id_komentara = %s AND ip_adresa = %s",
@@ -888,7 +893,7 @@ def najnovije_vesti():
             SELECT n.*, COUNT(l.id_vesti) AS lajkovi
             FROM novosti n
             LEFT JOIN lajkovi_vesti l ON n.id = l.id_vesti
-            GROUP BY n.id
+            GROUP BY n.id HAVING n.status = 1
             ORDER BY n.datum DESC, lajkovi DESC
             LIMIT 4
         """
@@ -901,7 +906,7 @@ def najnovije_vesti():
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
-            WHERE k.naziv = 'sport'
+            WHERE k.naziv = 'sport' AND n.status = 1
             ORDER BY n.datum DESC
             LIMIT 1
         """
@@ -913,7 +918,7 @@ def najnovije_vesti():
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
-            WHERE k.naziv = 'politika'
+            WHERE k.naziv = 'politika' AND n.status = 1
             ORDER BY n.datum DESC
             LIMIT 1
         """
@@ -925,7 +930,7 @@ def najnovije_vesti():
             SELECT n.*
             FROM novosti n
             INNER JOIN kategorije k ON n.kategorija = k.id
-            WHERE k.naziv = 'tehnologija'
+            WHERE k.naziv = 'tehnologija' AND n.status = 1
             ORDER BY n.datum DESC
             LIMIT 1
         """
