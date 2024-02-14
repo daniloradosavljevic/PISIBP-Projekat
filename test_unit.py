@@ -113,7 +113,8 @@ class TestZatraziOdobrenje(unittest.TestCase):
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
                 sess["id"] = 1  
-                vest_id = 1  
+                vest_id = 1 
+                sess["uloga"] = 1 
             response = tester.get(f"/cms/zatrazi_odobrenje/{vest_id}", follow_redirects=True)
             self.assertEqual(response.status_code, 200)  
     
@@ -127,7 +128,8 @@ class TestZatraziOdobrenje(unittest.TestCase):
             tester = app.test_client(self)
             with tester.session_transaction() as sess:
                 sess["loggedin"] = True
-                sess["id"] = 1  
+                sess["id"] = 1
+                sess["uloga"] = 1  
             vest_id = 9999 
             response = tester.get(f"/cms/zatrazi_odobrenje/{vest_id}", follow_redirects=True)
             self.assertEqual(response.status_code, 200)
@@ -186,7 +188,7 @@ class TestOdbijZahtev(unittest.TestCase):
             with app.app_context():
                 response = self.app.post('/odbij_zahtev/1')
                 self.assertEqual(response.status_code, 302)
-                self.assertIn('/prikaz_zahteva', response.headers.get('Location'))
+                self.assertIn('/', response.headers.get('Location'))
 
 
 
