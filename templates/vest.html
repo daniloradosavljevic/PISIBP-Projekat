@@ -1,61 +1,94 @@
 {% extends 'base.html' %} {% block body %}
-<div class="content">
-    <h2>{{ vest.naziv }}</h2>
-    <p>Author: {{ vest.author_username }}</p>
-    <p>Category: {{ vest.kategorija }}</p>
-    <p>Date: {{ vest.datum }}</p>
-    <p>Tags: {% for tag in vest.tagovi.split(', ') %}
+
+    <div class="container my-5">
+        <header class="jumbotron bg-dark">
+            <h2 class="display-4 text-center text-light">{{ vest.naziv }}</h2>
+    <p class="lead text-center text-light">Author: {{ vest.author_username }}</p>
+    <p class="lead text-center text-light">Category: {{ vest.kategorija }}</p>
+    <p class="lead text-center text-light">Date: {{ vest.datum }}</p>
+    <p class="lead text-center text-light">Tags: {% for tag in vest.tagovi.split(', ') %}
         <a href="#">#{{ tag }}</a> {% endfor %}
     </p>
-    <div>{{ vest.sadrzaj | safe }}</div>
-    <a href="{{ url_for('prikaz_novosti') }}">Vrati se na vesti</a>
-    <a href="{{ url_for('komentarisi', vest_id=vest.id) }}">Komentariši</a>
+        </header>
+    
+        <article class="card mx-auto" style="max-width: 800px;">
+            <div class="card-body">
+                <br><p class="lead">
+                    {{ vest['sadrzaj'] | replace('width="', '') | replace('height="', '') | replace('<img ', '<img style="width: 400px; height: 400px;" ') | safe}}
 
-    <form action="{{ url_for('lajkovanje', vest_id=vest.id, tip=0) }}" method="post">
-        <div class="d-flex align-items-center">
-            <!-- Flex container za poravnanje ikonice i dugmeta -->
-            <button type="submit" class="btn btn-primary {% if lajkovanje_info == 0 %}active{% endif %}">
-                &#x1F44D; <!-- Unicode simbol za palac gore -->
-            </button>
-            <span class="icon-label ml-2">{{ broj_lajkova(vest.id, 0) }}</span>
-        </div>
-    </form>
+                </p>
+            </div>
+            <div class="d-flex flex-row align-items-center text-light text-center">
+                <form action="{{ url_for('lajkovanje', vest_id=vest.id, tip=0) }}" method="post" class="btn text-light">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-thumbs-up"></i>
+                        <button type="submit" class="btn btn-white {% if lajkovanje_info == 0 %}btn-success{% endif %}">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </button>
+                        <span class="icon-label ml-2 text-dark">{{ broj_lajkova(vest.id, 0) }}</span>
+                    </div>
+                </form>
+            
+                <form action="{{ url_for('lajkovanje', vest_id=vest.id, tip=1) }}" method="post">
+                    <div class="d-flex align-items-center">
+                      
+                        <button type="submit" class="btn btn-white ml-2 {% if lajkovanje_info == 1 %} btn-danger {% endif %}">
+                            <i class="fa-solid fa-thumbs-down"></i> 
+                        </button>
+                        <span class="icon-label ml-2 text-dark">{{ broj_lajkova(vest.id, 1) }}</span>
+                    </div>
+                </form>
+            </div>
+        </article>
 
-    <form action="{{ url_for('lajkovanje', vest_id=vest.id, tip=1) }}" method="post">
-        <div class="d-flex align-items-center">
-            <!-- Flex container za poravnanje ikonice i dugmeta -->
-            <button type="submit" class="btn btn-danger ml-2 {% if lajkovanje_info == 1 %}active{% endif %}">
-                &#x1F44E; <!-- Unicode simbol za palac dolje -->
-            </button>
-            <span class="icon-label ml-2">{{ broj_lajkova(vest.id, 1) }}</span>
-        </div>
-    </form>
-</div>
-
+    </div>
+   <div class="container">
 {% if vest.komentari[0]['id'] is none %}
-<h1>Nema komentara</h1>
-{% else %}
-<div class="comments">
-    <h3>Komentari:</h3>
-    <ul>
-        {% for komentar in vest.komentari %}
-        <li>
-            <strong>{{ komentar.ime }}</strong>: {{ komentar.komentar }}
-            <form action="/lajkovanje_komentara/{{ komentar.id }}/{{ vest.id }}/0" method="post">
-                <button type="submit" class="btn btn-primary {% if broj_lajkova_komentara(komentar.id, 0) > 0 %}active{% endif %}">
-                    &#x1F44D; <!-- Unicode simbol za palac gore -->
-                </button>
-                <span class="icon-label ml-2">{{ broj_lajkova_komentara(komentar.id, 0) }}</span>
-            </form>
+<h1 class="text-center">Nema komentara</h1>
+<div class="text-center">
+    <a href="{{ url_for('komentarisi', vest_id=vest.id) }}" class="btn btn-secondary btn-lg bg-dark mt-3 mb-2" tabindex="-1" role="button" aria-disabled="true">Budi prvi da komentarises</a>
+</div>{% else %}
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="text-center">
+                <a href="{{ url_for('komentarisi', vest_id=vest.id) }}" class="btn btn-secondary btn-lg bg-dark mt-3" tabindex="-1" role="button" aria-disabled="true">Komentarisi</a>
+            </div>
+            {% for komentar in vest.komentari %}
 
-            <form action="/lajkovanje_komentara/{{ komentar.id }}/{{ vest.id }}/1" method="post">
-                <button type="submit" class="btn btn-danger ml-2 {% if broj_lajkova_komentara(komentar.id, 1) > 0 %}active{% endif %}">
-                    &#x1F44E; <!-- Unicode simbol za palac dolje -->
-                </button>
-                <span class="icon-label ml-2">{{ broj_lajkova_komentara(komentar.id, 1) }}</span>
-            </form>
-        </li>
+          <div class="card shadow-0 border bg-dark mb-4">
+            <div class="card-body p-4">
+              <div class="card mb-4 bg-dark">
+                <div class="card-body border border-white">
+                  <p class="text-light">{{ komentar.komentar }}</p>
+                  <div class="d-flex justify-content-between ">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="fa-solid fa-user" style="color: #ffffff;"></i>
+                      <p class="small mb-0 ms-2 px-3 text-light">{{ komentar.ime }}</p>
+                    </div>
+                    <div class="d-flex flex-row align-items-center text-light">
+                        <form action="/lajkovanje_komentara/{{ komentar.id }}/{{ vest.id }}/0" method="post">
+                            <button type="submit" class="btn text-light {% if broj_lajkova_komentara(komentar.id, 0) > 0 %}active{% endif %}">
+                                &#x1F44D; 
+                            <span class="icon-label ml-2">{{ broj_lajkova_komentara(komentar.id, 0) }}</span>
+                        </form>
+                        <form action="/lajkovanje_komentara/{{ komentar.id }}/{{ vest.id }}/1" method="post">
+                            <button type="submit" class="btn ml-2 {% if broj_lajkova_komentara(komentar.id, 1) > 0 %}active{% endif %}">
+                                &#x1F44E; 
+                            </button>
+                            <span class="icon-label ml-2 text-light">{{ broj_lajkova_komentara(komentar.id, 1) }}</span>
+                        </form>
+        
+                    </div>
+                    <p class="small mb-0 text-light">05.04.2023.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
-</div>
+        </div>
+        </div>
+        
+    
+
 {% endif %} {% endblock %}

@@ -1,39 +1,41 @@
 {% extends 'base.html' %} {% block body %}
 
-</br>
-</br>
-</br>
-</br>
-</br>
-<div align="center">
-    <div align="center" class="border">
-        <div class="header">
-            <h1 class="word">CMS - Registracija zaposlenog</h1>
-        </div>
-        <h2 class="word">
-            <form action="{{ url_for('register') }}" method="post">
+
+<div class="bg-image ">
+    <div class="container-fluid fw-bold">
+            <form action="{{ url_for('register') }}" method="post" class="mx-auto form_a">
+                <div class="header-text text-center">
+                    <h1 class="h1_lr">Registracija</h1>
+                </div>
                 <div class="msg">{{ msg }}</div>
                 {% if reg %}
                 <a class="bottom" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
                 {% else %}
-                <input id="username" name="username" type="text" placeholder="Enter Your Username" class="textbox" /></br>
-                </br>
-                <input id="password" name="password" type="password" placeholder="Enter Your Password" class="textbox" /></br>
-                </br>
-                <input id="email" name="email" type="text" placeholder="Enter Your Email ID" class="textbox" /></br>
-                </br>
-                <input id="ime" name="ime" type="text" placeholder="Enter Your First Name" class="textbox" /></br>
-                </br>
-                <input id="prezime" name="prezime" type="text" placeholder="Enter Your Last Name" class="textbox" /></br>
-                </br>
-                <select id="uloga" name="uloga" class="textbox">
-              <option value="" disabled selected hidden>- Uloga -</option>
-              <option value="2" placeholder="Vlasnik balon sale">Urednik</option>
-              <option value="3" placeholder="Igrac">Novinar</option>
-            </select></br>
-                </br>
-                <input type="submit" class="btn" value="Dodaj korisnika"></br>
-                <a class="bottom" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
+                <div class="input-group mb-3">
+                <input id="username" name="username" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Unesite korisnicko ime" class="textbox" />
+                </div>
+                <div class="input-group mb-3">
+                <input id="password" name="password" type="password" class="form-control form-control-lg bg-light fs-6" placeholder="Unesite lozinku" class="textbox" />
+                </div>
+                <div class="input-group mb-3">
+                <input id="email" name="email" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Unesite Email" class="textbox" />
+                </div>
+                <div class="input-group mb-3">
+                <input id="ime" name="ime" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Unesite ime" class="textbox" />
+                </div>
+                <div class="input-group mb-3">
+                <input id="prezime" name="prezime" type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Unesite prezime" class="textbox" />
+                </div>
+                <div class="input-group mb-3">
+                <select id="uloga" name="uloga" class="textbox form-control form-control-lg bg-light fs-6">
+                    <option value="" disabled selected hidden>- Uloga -</option>
+                    <option value="1" placeholder="Urednik">Urednik</option>
+                    <option value="2" placeholder="Novinar">Novinar</option>
+                </select>
+                </div>
+            
+                <input type="submit" class="btn btn-lg btn_1 w-100 fs-6" value="Dodaj korisnika">
+                <a class="bottom btn btn-lg btn_1 w-100 fs-6 mt-1" href="{{url_for('home')}}"> Vrati se na CMS </a></p>
 
                 {% endif %}
             </form>

@@ -1,27 +1,67 @@
 {% extends 'base.html' %} {% block body %}
-
-<h1>Kreiraj Novosti</h1>
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                <a href="{{ url_for('cms') }}" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <i class="fa-solid fa-person-digging text-white"></i><span class="fs-5 d-none d-sm-inline px-3">Meni</span>
+                </a>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start ulAnimacija" id="menu">
+                    <li class="liAnimacij zoom">
+                        <a href="{{ url_for('zaposleni') }}" class="nav-link px-0 align-middle">
+                            <i class="fa-solid fa-people-roof text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lista zaposlenih</span> </a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('kreiraj_novosti') }}" class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-file-circle-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Kreiraj novosti</span></a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('pregled_novosti') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz novosti</span></a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('prikaz_kategorija') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-list text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz kategorija</span></a>
+                    </li>
+                    <li class="liAnimacija zoom">
+                        <a href="{{ url_for('prikaz_zahteva') }}"  class="nav-link px-0 align-middle ">
+                            <i class="fa-solid fa-bell text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Prikaz zahteva</span></a>
+                    </li>
+                </ul>
+                <hr>
+                <div class="dropdown pb-4">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1">Korisnik</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                        <li><a class="dropdown-item" href="{{ url_for('najnovije_vesti') }}">Nazad na sajt</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Odjavi se</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col py-3 px-3">
+            <h1 class="text-center py-3">Kreiraj Novosti</h1>
 
 <form action="{{ url_for('kreiraj_novosti') }}" method="POST" enctype="multipart/form-data">
 
-    <label for="title">Naziv:</label>
-    <input type="text" id="title" name="title" required value="{{ title|e }}">
-
-    <label for="category">Kategorije:</label>
+    <label for="title" class="pb-3 "></label>
+    <input type="text" id="title" name="title" required value="{{ title|e }}" class="form-control" placeholder="Naziv">
+    <label for="category" class="py-3">Kategorije:</label>
     <select id="category" name="category" required>
         {% for category in categories %}
         <option value="{{ category[0] }}">{{ category[1] }}</option>
         {% endfor %}
-    </select>
+    </select><br>
 
-    <label for="content">Sadrzaj:</label>
-    <textarea id="editor" name="content">{{ content|e }}</textarea>
+    <label for="content">Sadrzaj:</label><br>
+    <textarea id="editor" name="content">{{ content|e }}</textarea><br>
 
     <label for="tags">Tagovi:</label>
     <p>Unesite tagove razdvojene zarezom (npr. fudbal, manchester city, barcelona)</p>
-    <textarea id="tags" name="tags" style="width: 300px;"></textarea>
+    <textarea id="tags" name="tags" style="width: 300px;"></textarea><br>
 
-    <button type="submit">Objavi</button>
+    <button type="submit" class="btn btn-dark">Objavi</button>
 </form>
 
 <script src="https://cdn.tiny.cloud/1/zkg28kxvnu9159r9s043yf77k4a5loyteodvjytupjrmqai6/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
@@ -52,4 +92,8 @@
         menubar: false
     });
 </script>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
