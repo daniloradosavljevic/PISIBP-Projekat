@@ -19,4 +19,15 @@ Uputstvo za pokretanje aplikacije:
 - Kreirajte 9125 članaka u terminalu sa - python skripta.py
 - Pokrenite aplikaciju u terminalu korišćenjem: python app.py
   
-NAPOMENA: Što se tiče Devops-a, napravljeni su odvojeni kontejneri za Flask Aplikaciju i MySQL bazu podataka, ali nije uspešno rešen problem pri povezivanju ove dve komponente (Funkcioniše sa određenim stranicama, ali ne sa onim koje koriste bazu podataka). Verovatano je zbog verzija Pythona i MySQL-a. 
+NAPOMENA: Što se tiče Devops-a, napravljeni su odvojeni docker kontejneri za Flask Aplikaciju i MySQL bazu podataka, te je neophodno da se oni pravilno povežu.
+
+# Skrinšotovi projekta:
+
+![baze1](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/ff13a3a3-6b50-4137-a313-727b6aec9a41)
+![baze2](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/669a87ce-21ed-40b3-8d13-dd1a53e88a34)
+![baze3](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/82a52eda-7133-44c4-90c2-a900046a8551)
+![baze4](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/4b1d7950-a898-4f8c-a6f1-4d7054353b65)
+
+
+
+
