@@ -25,19 +25,19 @@ NAPOMENA: Što se tiče Devops-a, napravljeni su odvojeni docker kontejneri za F
 
 <em>1. Prikaz naslovne stranice sa najnovijim vestima</em>
 
-<img src="https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/ff13a3a3-6b50-4137-a313-727b6aec9a41" width="800" height="666">
+![baze1](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/ff13a3a3-6b50-4137-a313-727b6aec9a41)
 
 <em>2. Prikazivanje stranice sa pojedinačnom vešću</em>
 
-<img src="https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/669a87ce-21ed-40b3-8d13-dd1a53e88a34" width="800" height="666">
+![baze2](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/669a87ce-21ed-40b3-8d13-dd1a53e88a34)
 
 <em>3. UI za kreiranje vesti</em>
 
-<img src="https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/82a52eda-7133-44c4-90c2-a900046a8551" width="800" height="666">
+![baze3](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/82a52eda-7133-44c4-90c2-a900046a8551)
 
 <em>4. Arhiva svih vesti</em>
 
-<img src="https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/4b1d7950-a898-4f8c-a6f1-4d7054353b65" width="800" height="666">
+![baze4](https://github.com/daniloradosavljevic/PISIBP-Projekat/assets/57499647/4b1d7950-a898-4f8c-a6f1-4d7054353b65)
 
 
 
